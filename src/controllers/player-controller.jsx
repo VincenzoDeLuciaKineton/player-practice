@@ -1,9 +1,15 @@
-import React from 'react';
-import PlayerView from '../views/mpd-player/mpd-player-view'
+import React, { useState } from 'react';
+import MpdPlayerView from '../views/mpd-player/mpd-player-view'
+import Controls from '../views/controls/controls'
 
 const PlayerController = () => {
+    const [player, setPlayer] = useState(null);
+
     return (
-        <PlayerView />
+        <div className='video-and-controls'>
+            <MpdPlayerView setPlayer={setPlayer} />
+            { player.isReady ? <Controls /> : null}
+        </div>
     )
 }
 
