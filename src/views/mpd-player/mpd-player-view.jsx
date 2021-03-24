@@ -1,24 +1,24 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import './mpd-player-view.css'
 
 const MpdPlayerView = ({ setPlayer }) => {
+
     const dashjs = window.dashjs;
-    const player = useRef(null);
+    const player = dashjs.MediaPlayer().create();
+
 
     useEffect(() => {
-        player.current = dashjs.MediaPlayer().create();
         fetch(`${process.env.PUBLIC_URL}/config.json`).then(res => {
             return res.json();
         }).then(res => {
-            player.current.initialize(document.querySelector("#videoPlayer"), res.mpdUrl, true);
-            console.log('player.current: ', player.current)
+            player.initialize(document.querySelector("#videoPlayer"), res.url, true);
+            console.log('player object: ', player)
+            setPlayer(player)
         })
-    })
+    }, [])
 
     return (
-        <div className='player-view'>
-            <video id="videoPlayer"></video>
-        </div>
+        <video id="videoPlayer"></video>
     )
 }
 

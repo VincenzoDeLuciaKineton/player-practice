@@ -1,27 +1,33 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 
 const Controls = ({ player }) => {
 
-    useEffect(() => {
-        console.log('player being passed to the controls: ', player)
-    })
-
-    const playerState = useRef();
+    const [playerState, setPlayerState] = useState('pause')
 
     const play = () => {
-        playerState.current = 'play'
+        setPlayerState('play')
         player.play()
     }
 
     const pause = () => {
-        playerState.current = 'pause'
+        setPlayerState('pause')
         player.pause();
+    }
+
+    const onRewind = () => {
+        console.log('rewind')
+    }
+
+    const onFastForward = () => {
+        console.log('fast forward')
     }
 
     return (
         <div className='controls'>
-            <button className='play-button controls-button' onClick={play}>Play</button>
-            <button className='pause-button controls-button' onClick={pause}>Pause</button>
+            <button className='controls-button rewind' onClick={onRewind}>Rewind</button>
+            {playerState === 'pause' ? <button className='play-button controls-button' onClick={play}>Play</button> :
+                <button className='pause-button controls-button' onClick={pause}>Pause</button>}
+            <button className='controls-button rewind' onClick={onFastForward}>Fast Forward</button>
         </div>
     )
 }
