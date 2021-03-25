@@ -6,6 +6,7 @@ import Controls from '../controls/controls'
 const MpdPlayerView = () => {
 
     const [player, setPlayer] = useState(null)
+    const [currentTime, setCurrentTime] = useState(0);
 
     const config = useContext(ConfigContext)
 
@@ -17,22 +18,44 @@ const MpdPlayerView = () => {
             setPlayer(initializedPlayer)
             document.getElementById('videoPlayer').addEventListener('play', onPlay)
             document.getElementById('videoPlayer').addEventListener('pause', onPause)
+            document.getElementById('videoPlayer').addEventListener('playing', onPlaying)
+            document.getElementById('videoPlayer').addEventListener('timeupdate', onTimeUpdate)
+
+
+            return () => {
+                if (player) {
+                    document.getElementById('videoPlayer').removeEventListener('play', onPlay)
+                    document.getElementById('videoPlayer').removeEventListener('pause', onPause)
+                    document.getElementById('videoPlayer').removeEventListener('playing', onPlaying)
+                    document.getElementById('videoPlayer').removeEventListener('timeupdate', onTimeUpdate)
+                }
+            }
+
         }
     }, [])
 
     const onPlay = () => {
-        console.log('PLAY EVENT FROM THE VIDEO TAG')
+        console.log('Play')
     }
 
     const onPause = () => {
         console.log('PAUSE EVENT FROM THE VIDEO TAG')
     }
 
+    const onPlaying = () => {
+        console.log('Playing')
+    }
+
+    const onTimeUpdate = () => {
+        setCurrentTime(document.getElementById('videoPlayer').currentTime)
+        console.log('Setting currentTime to: ', document.getElementById('videoPlayer').currentTime)
+    }
+
 
     return (
         <div className='video-and-controls'>
             <video id="videoPlayer"></video>
-            <Controls player={player} />
+            <Controls player={player} currentTime={currentTime} setCurrentTime={setCurrentTime} />
         </div>
     )
 }
