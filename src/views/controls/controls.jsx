@@ -1,40 +1,40 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { AntaresHorizontalList, AntaresFocusable, navigationUtilities } from 'antares'
 import './controls.css'
-
+import { PlayerContext } from '../../context/PlayerContext'
 
 const Controls = (props) => {
 
     const [playerState, setPlayerState] = useState('pause')
+    const { instanceOfPlayer, duration, setDuration, currentTime, setCurrentTime } = useContext(PlayerContext)
 
     useEffect(() => {
         props.focusTo('play-button')
     }, [])
 
     useEffect(() => {
-        console.log('currentTime from the controls: ', props.currentTime)
-    }, [props.currentTime])
+        const progress = Math.floor((currentTime / duration) * 100)
+        console.log('progress: ', progress, '%')
+    }, [currentTime])
 
     const playOrPause = () => {
         if (playerState === 'pause') {
             setPlayerState('play')
-            props.player.play()
+            instanceOfPlayer.play()
         } else if (playerState === 'play') {
             setPlayerState('pause')
-            props.player.pause();
+            instanceOfPlayer.pause();
         }
     }
 
-
-
     const onRewind = () => {
-        console.log('rewind')
-        props.setCurrentTime(props.currentTime += 40)
+        document.getElementById('videoPlayer').currentTime -= 40
+        console.log('rewind to: ', document.getElementById('videoPlayer').currentTime)
     }
 
     const onFastForward = () => {
-        console.log('fast forward');
-        props.setCurrentTime(props.currentTime += 40)
+        document.getElementById('videoPlayer').currentTime += 40
+        console.log('fast forward to: ', document.getElementById('videoPlayer').currentTime);
     }
 
     return (
