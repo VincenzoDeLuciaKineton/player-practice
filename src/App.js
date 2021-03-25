@@ -1,11 +1,12 @@
 import './App.css';
 import AppController from './controllers/app-controller'
+import Antares from "antares";
 
 function App() {
   return (
-    <div className="App">
+    <Antares className="App" federated={false}>
       <AppController />
-    </div>
+    </Antares>
   );
 }
 

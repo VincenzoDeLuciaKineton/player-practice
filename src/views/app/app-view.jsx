@@ -1,13 +1,17 @@
 import React from 'react'
 import './app-view.css'
+import { navigationUtilities } from 'antares'
 import PlayerController from '../../controllers/player-controller'
+import { ConfigProvider } from '../../context/ConfigContext'
 
 const AppView = () => {
     return (
-        <div className='app'>
-            <PlayerController />
-        </div>
+        <ConfigProvider>
+            <div className='app'>
+                <PlayerController />
+            </div>
+        </ConfigProvider>
     )
 }
 
-export default AppView
+export default navigationUtilities(AppView)

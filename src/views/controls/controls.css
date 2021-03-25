@@ -1,6 +1,41 @@
-.controls {
+.controls-outer{
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    width: 1280px !important;
+    height: 200px !important;
 }
+
+.controls-inner{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 200px !important;
+    width: 1280px !important;
+}
+
+.controls-button {
+    width: 200px !important;
+    height: 80px !important;
+    margin: 0px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.controls-button-focused {
+    width: 200px !important;
+    height: 80px !important;
+    background-color: yellow;
+    margin: 0px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
