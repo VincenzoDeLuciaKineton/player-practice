@@ -1,0 +1,27 @@
+.progress-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.total-duration {
+    width: 1280px;
+    height: 10px;
+    background-color: black;
+}
+
+.progress {
+   height: 10px;
+   background-color: yellow;
+}
+.time-info {
+    width: 1280px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.time-info span {
+    font-size: 24px;
+}

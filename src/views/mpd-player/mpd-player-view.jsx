@@ -1,70 +1,81 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useRef, useState } from 'react'
 import { ConfigContext } from '../../context/ConfigContext'
 import './mpd-player-view.css'
 import Controls from '../controls/controls'
 import ProgressBarView from '../progress-bar/progress-bar-view'
-import { PlayerContext } from '../../context/PlayerContext'
 
 const MpdPlayerView = () => {
 
+    const [currentTime, setCurrentTime] = useState(0)
+    const [duration, setDuration] = useState(0)
+
     const config = useContext(ConfigContext)
-    const { setDuration, setCurrentTime, instanceOfPlayer, setInstanceOfPlayer } = useContext(PlayerContext)
+
+    const playerRef = useRef(null);
+    const playerStateRef = useRef(null)
 
     useEffect(() => {
         const dashjs = window.dashjs
         const initializedPlayer = dashjs.MediaPlayer().create()
         if (config.url) {
-            initializedPlayer.initialize(document.getElementById('videoPlayer'), config.url, true);
-            setInstanceOfPlayer(initializedPlayer)
-            document.getElementById('videoPlayer').addEventListener('play', onPlay)
-            document.getElementById('videoPlayer').addEventListener('pause', onPause)
-            document.getElementById('videoPlayer').addEventListener('playing', onPlaying)
-            document.getElementById('videoPlayer').addEventListener('timeupdate', onTimeUpdate)
-            document.getElementById('videoPlayer').addEventListener('durationchange', onDurationChange)
-
-
+            initializedPlayer.initialize(playerRef.current, config.url, true);
+            playerRef.current.addEventListener('durationchange', onDurationChange)
+            playerRef.current.addEventListener('loadeddata', onLoadedData)
+            playerRef.current.addEventListener('pause', onPause)
+            playerRef.current.addEventListener('play', onPlay)
+            playerRef.current.addEventListener('playing', onPlaying)
+            playerRef.current.addEventListener('timeupdate', onTimeUpdate)
         }
 
         return () => {
-            if (instanceOfPlayer) {
-                document.getElementById('videoPlayer').removeEventListener('play', onPlay)
-                document.getElementById('videoPlayer').removeEventListener('pause', onPause)
-                document.getElementById('videoPlayer').removeEventListener('playing', onPlaying)
-                document.getElementById('videoPlayer').removeEventListener('timeupdate', onTimeUpdate)
+            if (playerRef.current) {
+                playerRef.current.removeEventListener('durationchange', onDurationChange)
+                playerRef.current.removeEventListener('pause', onPause)
+                playerRef.current.removeEventListener('play', onPlay)
+                playerRef.current.removeEventListener('playing', onPlaying)
+                playerRef.current.removeEventListener('timeupdate', onTimeUpdate)
             }
         }
     }, [])
 
-    const onPlay = () => {
-        console.log('Play')
-    }
-
-    const onPause = () => {
-        console.log('PAUSE EVENT FROM THE VIDEO TAG')
-    }
-
-    const onPlaying = () => {
-        console.log('Playing')
-    }
-
-    const onTimeUpdate = () => {
-        setCurrentTime(document.getElementById('videoPlayer').currentTime)
-        /* console.log('Setting currentTime to: ', document.getElementById('videoPlayer').currentTime) */
-    }
-
     const onDurationChange = () => {
-        console.log('duration: ', document.getElementById('videoPlayer').duration)
-        if (document.getElementById('videoPlayer').duration > 0) {
-            setDuration(document.getElementById('videoPlayer').duration)
+        console.log('duration: ', playerRef.current.duration)
+        playerStateRef.current = 'durationchange'
+        if (playerRef.current.duration > 0) {
+            setDuration(playerRef.current.duration)
         }
     }
 
+    const onLoadedData = () => {
+        console.log('Event from the player: Loaded Data')
+        playerStateRef.current = 'loadeddata'
+    }
+
+    const onPlay = () => {
+        console.log('Event from the player: Play')
+        playerStateRef.current = 'play'
+    }
+
+    const onPause = () => {
+        console.log('Event from the player: Pause')
+        playerStateRef.current = 'pause'
+    }
+
+    const onPlaying = () => {
+        console.log('Event from the player: Playing')
+        playerStateRef.current = 'playing'
+    }
+
+    const onTimeUpdate = () => {
+        setCurrentTime(parseInt(playerRef.current.currentTime))
+        playerStateRef.current = 'timeupdate'
+    }
 
     return (
         <div className='video-and-controls'>
-            <video id="videoPlayer"></video>
-            <ProgressBarView />
-            <Controls />
+            <video id="videoPlayer" ref={playerRef} autoplay='true'></video>
+            {duration > 0 ? <div><ProgressBarView currentTime={currentTime} duration={duration} />
+                <Controls instanceOfPlayer={playerRef.current} playerState={playerStateRef.current} /></div> : null}
         </div>
     )
 }

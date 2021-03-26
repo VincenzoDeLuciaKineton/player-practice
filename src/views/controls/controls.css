@@ -8,10 +8,10 @@
 }
 
 .controls-inner{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
     height: 200px !important;
     width: 1280px !important;
 }
