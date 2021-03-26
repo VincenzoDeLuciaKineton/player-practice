@@ -1,0 +1,38 @@
+.home-outer {
+    width: 300px !important;
+    height: 100px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center!important;
+}
+
+.home-inner {
+    width: 300px !important;
+    height: 100px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center!important;
+}
+
+.home-button {
+    font-size: 40px ;
+    width: 300px !important;
+    font-size: 100px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center!important;
+}
+
+.focused-home-button {
+    font-size: 40px;
+    width: 300px !important;
+    height: 100px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center!important;
+    background-color: yellow;
+}
