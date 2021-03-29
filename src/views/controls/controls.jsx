@@ -43,7 +43,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         controlsCountdownRef.current = null;
         controlsCountdownRef.current = setTimeout(() => {
             setDisplayControls(false);
-            pauseSpatialNavigation();
+            //pauseSpatialNavigation();
             console.log('resetControlsCountdown displayControls: ', displayControls)
         }, controlsCountdownFromConfig)
     }
@@ -83,7 +83,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                 controlsCountdownRef.current = null;
                 controlsCountdownRef.current = setTimeout(() => {
                     setDisplayControls(false);
-                    pauseSpatialNavigation();
+                    //pauseSpatialNavigation();
                 }, controlsCountdownFromConfig)
             }
 
@@ -94,9 +94,13 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             } else {
                 console.log('parentFocusable: ', parentFocusable)
                 /* setUrl(null); */
+                resumeSpatialNavigation()
+                setTimeout(() => {
+                    focusTo('home-button')
+                    console.log('partneFocusable from the setTimeout: ', parentFocusable)
+                }, 3000);
                 setReadyToPlay(false);
                 setDisplayPlayer(false);
-                focusTo(parentFocusable)
             }
         }
 
@@ -120,7 +124,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             controlsCountdownRef.current = null;
             controlsCountdownRef.current = setTimeout(() => {
                 setDisplayControls(false);
-                pauseSpatialNavigation();
+                //pauseSpatialNavigation();
             }, controlsCountdownFromConfig)
         } else {
             clearInterval(skipRef.current)
@@ -139,13 +143,13 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Funzionalità del tasto rewind
     const onRewind = () => {
         if (!displayControls) {
-            pauseSpatialNavigation()
+            //pauseSpatialNavigation()
             setDisplayControls(true)
             clearTimeout(controlsCountdownRef.current);
             controlsCountdownRef.current = null;
             controlsCountdownRef.current = setTimeout(() => {
                 setDisplayControls(false);
-                pauseSpatialNavigation();
+                //pauseSpatialNavigation();
             }, controlsCountdownFromConfig)
         } else {
             controlRef.current = 'rewind';
@@ -178,13 +182,13 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Funzionalità del tasto fast forward
     const onFastForward = () => {
         if (!displayControls) {
-            pauseSpatialNavigation()
+            //pauseSpatialNavigation()
             setDisplayControls(true)
             clearTimeout(controlsCountdownRef.current);
             controlsCountdownRef.current = null;
             controlsCountdownRef.current = setTimeout(() => {
                 setDisplayControls(false);
-                pauseSpatialNavigation();
+                //pauseSpatialNavigation();
             }, controlsCountdownFromConfig)
         } else {
             controlRef.current = 'fast-forward';
@@ -236,6 +240,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             <AntaresHorizontalList containerClassname='controls-outer'
                 innerClassname='controls-inner'
                 forceFocus={true}
+                remainInFocus={true}
                 fixed={true}
                 innerWidth={1280}
             >

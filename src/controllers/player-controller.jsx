@@ -7,7 +7,7 @@ import LoaderView from '../views/loader/loader-view'
 const PlayerController = () => {
 
     const { url, readyToPlay } = useContext(ConfigContext);
-    const { neededPlayer, setNeededPlayer } = useContext(PlayerContext)
+    const { neededPlayer, setNeededPlayer, displayPlayer } = useContext(PlayerContext)
 
     useEffect(() => {
         if (url && url.endsWith('.mpd')) {
@@ -18,11 +18,11 @@ const PlayerController = () => {
     })
 
     return (
-        <div className='player-controller'>
+        displayPlayer ? <div className='player-controller'>
             {!readyToPlay ? <LoaderView /> :
                 neededPlayer === 'dashjs' ? <MpdPlayerView /> :
                     neededPlayer === 'videojs' ? <span>You need a videojs player</span> : <span>Format not supported by the player</span>}
-        </div>
+        </div> : null
     )
 }
 

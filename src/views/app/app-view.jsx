@@ -11,7 +11,8 @@ const AppView = () => {
 
     return (
         <div className='app'>
-            {!displayPlayer ? <HomeView /> : <PlayerController />}
+            <HomeView />
+            <PlayerController />
         </div>
     )
 }
