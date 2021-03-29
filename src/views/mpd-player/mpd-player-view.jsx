@@ -2,14 +2,14 @@ import React, { useEffect, useContext, useRef, useState } from 'react'
 import { ConfigContext } from '../../context/ConfigContext'
 import './mpd-player-view.css'
 import Controls from '../controls/controls'
-import ProgressBarView from '../progress-bar/progress-bar-view'
 
 const MpdPlayerView = () => {
+
+    const { url } = useContext(ConfigContext)
 
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
 
-    const config = useContext(ConfigContext)
 
     const playerRef = useRef(null);
     const playerStateRef = useRef(null)
@@ -17,8 +17,8 @@ const MpdPlayerView = () => {
     useEffect(() => {
         const dashjs = window.dashjs
         const initializedPlayer = dashjs.MediaPlayer().create()
-        if (config.url) {
-            initializedPlayer.initialize(playerRef.current, config.url, true);
+        if (url) {
+            initializedPlayer.initialize(playerRef.current, url, true);
             playerRef.current.addEventListener('durationchange', onDurationChange)
             playerRef.current.addEventListener('loadeddata', onLoadedData)
             playerRef.current.addEventListener('pause', onPause)
@@ -29,12 +29,17 @@ const MpdPlayerView = () => {
 
         return () => {
             if (playerRef.current) {
+                console.log('UNMOUNTING PLAYER EFFECTS')
                 playerRef.current.removeEventListener('durationchange', onDurationChange)
                 playerRef.current.removeEventListener('pause', onPause)
                 playerRef.current.removeEventListener('play', onPlay)
                 playerRef.current.removeEventListener('playing', onPlaying)
                 playerRef.current.removeEventListener('timeupdate', onTimeUpdate)
+                playerStateRef.current = null;
+                playerRef.current = null;
             }
+            initializedPlayer.destroy();
+            console.log('Player unmounted')
         }
     }, [])
 
@@ -74,8 +79,8 @@ const MpdPlayerView = () => {
     return (
         <div className='video-and-controls'>
             <video id="videoPlayer" ref={playerRef} autoplay='true'></video>
-            {duration > 0 ? <div><ProgressBarView currentTime={currentTime} duration={duration} />
-                <Controls instanceOfPlayer={playerRef.current} playerState={playerStateRef.current} /></div> : null}
+            {duration > 0 ?
+                <Controls instanceOfPlayer={playerRef.current} playerState={playerStateRef.current} currentTime={currentTime} duration={duration} /> : null}
         </div>
     )
 }

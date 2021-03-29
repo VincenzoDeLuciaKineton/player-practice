@@ -1,14 +1,21 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import './home-view.css'
 import { AntaresHorizontalList, AntaresFocusable, navigationUtilities } from 'antares'
-const HomeView = (props) => {
+import { PlayerContext } from '../../context/PlayerContext'
+import { ConfigContext } from '../../context/ConfigContext'
+const HomeView = ({ focusTo }) => {
+
+    const { setDisplayPlayer, setParentFocusable } = useContext(PlayerContext)
+    const { url, setUrl } = useContext(ConfigContext)
 
     useEffect(() => {
-        props.focusTo('home-button-id')
+        focusTo('home-button-id');
     }, [])
 
     const onEnterDown = () => {
-        props.setStartPlayer(true);
+        setUrl(url);
+        setParentFocusable('home-button');
+        setDisplayPlayer(true);
     }
 
     return (

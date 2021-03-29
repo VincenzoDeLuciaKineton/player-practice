@@ -1,11 +1,17 @@
 import React from 'react';
 import AppView from '../views/app/app-view';
+import { ConfigProvider } from '../context/ConfigContext'
+import { PlayerProvider } from '../context/PlayerContext'
 
 const AppController = () => {
     return (
-        <div className='app-controller'>
-            <AppView />
-        </div>
+        <ConfigProvider>
+            <PlayerProvider>
+                <div className='app-controller'>
+                    <AppView />
+                </div>
+            </PlayerProvider>
+        </ConfigProvider>
     )
 }
 
