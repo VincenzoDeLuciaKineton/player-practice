@@ -6,21 +6,21 @@ import { ConfigContext } from '../../context/ConfigContext'
 const HomeView = ({ focusTo }) => {
 
     const { setDisplayPlayer, setParentFocusable } = useContext(PlayerContext)
-    const { url, setUrl } = useContext(ConfigContext)
+    const { readyToPlay, setReadyToPlay } = useContext(ConfigContext)
 
     useEffect(() => {
         focusTo('home-button-id');
     }, [])
 
     const onEnterDown = () => {
-        setUrl(url);
         setParentFocusable('home-button');
+        setReadyToPlay(true);
         setDisplayPlayer(true);
     }
 
     return (
         <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home'>
-            <AntaresFocusable classname='home-button' focusedClassname='focused-home-button' focusableId='home-button-id' onEnterDown={onEnterDown}>
+            <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown}>
                 <span>Go to the player</span>
             </AntaresFocusable>
         </AntaresHorizontalList>

@@ -11,15 +11,6 @@
     align-items: center !important;
 }
 
-.loader-episodes-container{
-    display: flex;
-    width: 1920px;
-    height: 410px;
-    z-index: 150;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
 .loader-player {
     display: block;
     content: "";

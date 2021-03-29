@@ -5,7 +5,7 @@ import Controls from '../controls/controls'
 
 const MpdPlayerView = () => {
 
-    const { url } = useContext(ConfigContext)
+    const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext)
 
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
@@ -15,9 +15,10 @@ const MpdPlayerView = () => {
     const playerStateRef = useRef(null)
 
     useEffect(() => {
+        console.log('Initializing player')
         const dashjs = window.dashjs
         const initializedPlayer = dashjs.MediaPlayer().create()
-        if (url) {
+        if (url && readyToPlay) {
             initializedPlayer.initialize(playerRef.current, url, true);
             playerRef.current.addEventListener('durationchange', onDurationChange)
             playerRef.current.addEventListener('loadeddata', onLoadedData)
@@ -30,14 +31,15 @@ const MpdPlayerView = () => {
         return () => {
             if (playerRef.current) {
                 console.log('UNMOUNTING PLAYER EFFECTS')
+                playerRef.current.removeEventListener('timeupdate', onTimeUpdate)
                 playerRef.current.removeEventListener('durationchange', onDurationChange)
                 playerRef.current.removeEventListener('pause', onPause)
                 playerRef.current.removeEventListener('play', onPlay)
                 playerRef.current.removeEventListener('playing', onPlaying)
-                playerRef.current.removeEventListener('timeupdate', onTimeUpdate)
-                playerStateRef.current = null;
-                playerRef.current = null;
             }
+            setReadyToPlay(false);
+            playerStateRef.current = null;
+            playerRef.current = null;
             initializedPlayer.destroy();
             console.log('Player unmounted')
         }
@@ -72,8 +74,10 @@ const MpdPlayerView = () => {
     }
 
     const onTimeUpdate = () => {
-        setCurrentTime(parseInt(playerRef.current.currentTime))
-        playerStateRef.current = 'timeupdate'
+        if (playerRef.current) {
+            setCurrentTime(parseInt(playerRef.current.currentTime))
+            playerStateRef.current = 'timeupdate'
+        }
     }
 
     return (

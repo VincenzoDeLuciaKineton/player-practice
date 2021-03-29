@@ -2,29 +2,58 @@ import React, { useEffect, useRef, useState, useContext } from 'react'
 import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent } from 'antares'
 import './controls.css'
 import { PlayerContext } from '../../context/PlayerContext'
-import ProgressBarView from '../progress-bar/progress-bar-view'
 import { ConfigContext } from '../../context/ConfigContext'
+import ProgressBarView from '../progress-bar/progress-bar-view'
 
-const Controls = ({ focusTo, instanceOfPlayer, playerState, duration, currentTime }) => {
 
-    const { setUrl } = useContext(ConfigContext)
+// Import degli asset 
+import Pause from "../assets/images/pause-default.png";
+import Play from "../assets/images/play-default.png";
+import Rewind from "../assets/images/bw-default.png";
+import FastForward from "../assets/images/fw-default.png";
+import HighlightedPlay from "../assets/images/play-focus.png";
+import HighlightedPause from "../assets/images/pause-focus.png";
+import HighlightedFastForward from "../assets/images/fw-focus.png";
+import HighlightedRewind from "../assets/images/bw-focus.png";
+
+const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
+    //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
+    const { setReadyToPlay, controlsCountdownFromConfig } = useContext(ConfigContext)
     const { setDisplayPlayer, parentFocusable } = useContext(PlayerContext);
 
+    //Stati: valori pertinenti al singolo componente/pagina il cui cambiamento causa un re-render
     const [displayControls, setDisplayControls] = useState(true)
     const [skipRate, setSkipRate] = useState(1);
+    const [isHighlighted, setIsHighlighted] = useState({
+        play: true,
+        forward: false,
+        rewind: false,
+    });
 
+    //Ref: valorri relativi al componente/pagina indipendenti dal ciclo di vita
     const isPlayingRef = useRef(false)
     const skipRef = useRef(null);
     const controlRef = useRef('play')
     const controlsCountdownRef = useRef(null)
     let onKeyDown = undefined;
 
+    //Funzione che resetta il countdown per nascondere i controlli
+    const resetControlsCountdown = () => {
+        clearTimeout(controlsCountdownRef.current);
+        controlsCountdownRef.current = null;
+        controlsCountdownRef.current = setTimeout(() => {
+            setDisplayControls(false);
+            pauseSpatialNavigation();
+            console.log('resetControlsCountdown displayControls: ', displayControls)
+        }, controlsCountdownFromConfig)
+    }
 
+    // useEffect di mount
     useEffect(() => {
         focusTo('play-button')
         controlsCountdownRef.current = setTimeout(() => {
-            setDisplayControls(false)
-        }, 5000)
+            resetControlsCountdown();
+        }, controlsCountdownFromConfig)
 
         return () => {
             clearTimeout(controlsCountdownRef.current);
@@ -33,40 +62,41 @@ const Controls = ({ focusTo, instanceOfPlayer, playerState, duration, currentTim
 
     }, [])
 
-    useEffect(() => {
+    /* useEffect(() => {
         console.log('PlayerState from the controls: ', playerState)
-    }, [playerState])
+    }, [playerState]) */
 
-    useEffect(() => {
-        if (instanceOfPlayer) {
-            instanceOfPlayer.play()
-        }
-    }, [instanceOfPlayer])
-
-
+    //Mapping dei controlli che non sono di navigazione 
     const onKeyDownHandler = (e) => {
         if (
             e.keyCode === 37 ||
             e.keyCode === 39 ||
             e.keyCode === 38 ||
-            e.keyCode === 40 ||
-            e.keyCode === 13
+            e.keyCode === 40
         ) {
             console.log('Resetting controls timeout')
-            setDisplayControls(true);
-            clearTimeout(controlsCountdownRef.current);
-            controlsCountdownRef.current = null;
-            controlsCountdownRef.current = setTimeout(() => {
-                setDisplayControls(false);
-            }, 5000)
+            if (!displayControls) {
+                setDisplayControls(true);
+            } else {
+                resumeSpatialNavigation();
+                clearTimeout(controlsCountdownRef.current);
+                controlsCountdownRef.current = null;
+                controlsCountdownRef.current = setTimeout(() => {
+                    setDisplayControls(false);
+                    pauseSpatialNavigation();
+                }, controlsCountdownFromConfig)
+            }
+
         }
         if (e.keyCode === 8 || e.keyCode === 461) {
             if (displayControls) {
                 setDisplayControls(false);
             } else {
-                focusTo(parentFocusable)
-                setUrl(null)
+                console.log('parentFocusable: ', parentFocusable)
+                /* setUrl(null); */
+                setReadyToPlay(false);
                 setDisplayPlayer(false);
+                focusTo(parentFocusable)
             }
         }
 
@@ -80,74 +110,128 @@ const Controls = ({ focusTo, instanceOfPlayer, playerState, duration, currentTim
             removeKeydownEvent(onKeyDown);
         };
     }, [onKeyDownHandler]);
+    //////////////////////////////////////////////////////
 
+    //Funzionalità del tasto Play
     const playOrPause = () => {
-        clearInterval(skipRef.current)
-        skipRef.current = null
-        setSkipRate(1)
-        if (!isPlayingRef.current) {
-            isPlayingRef.current = true
-            instanceOfPlayer.play()
+        if (!displayControls) {
+            setDisplayControls(true)
+            clearTimeout(controlsCountdownRef.current);
+            controlsCountdownRef.current = null;
+            controlsCountdownRef.current = setTimeout(() => {
+                setDisplayControls(false);
+                pauseSpatialNavigation();
+            }, controlsCountdownFromConfig)
         } else {
-            isPlayingRef.current = false
-            instanceOfPlayer.pause()
-        }
-    }
-
-    const onRewind = () => {
-        controlRef.current = 'rewind';
-        if (controlRef.current !== 'rewind') {
             clearInterval(skipRef.current)
             skipRef.current = null
             setSkipRate(1)
+            if (!isPlayingRef.current) {
+                isPlayingRef.current = true
+                instanceOfPlayer.play()
+            } else {
+                isPlayingRef.current = false
+                instanceOfPlayer.pause()
+            }
         }
-        clearInterval(skipRef.current)
-        skipRef.current = null
-        switch (skipRate) {
-            default:
-                return
-            case 0:
-                setSkipRate(1);
-                break
-            case 1:
-                setSkipRate(2);
-                break
-            case 2:
-                setSkipRate(4)
-        }
-        skipRef.current = setInterval(() => {
-            instanceOfPlayer.currentTime -= 10 * skipRate
-        }, 1000)
-        console.log('rewind to: ', instanceOfPlayer.currentTime);
     }
 
-    const onFastForward = () => {
-        controlRef.current = 'fast-forward';
-        if (controlRef.current !== 'fast-forward') {
+    //Funzionalità del tasto rewind
+    const onRewind = () => {
+        if (!displayControls) {
+            pauseSpatialNavigation()
+            setDisplayControls(true)
+            clearTimeout(controlsCountdownRef.current);
+            controlsCountdownRef.current = null;
+            controlsCountdownRef.current = setTimeout(() => {
+                setDisplayControls(false);
+                pauseSpatialNavigation();
+            }, controlsCountdownFromConfig)
+        } else {
+            controlRef.current = 'rewind';
+            if (controlRef.current !== 'rewind') {
+                clearInterval(skipRef.current)
+                skipRef.current = null
+                setSkipRate(1)
+            }
             clearInterval(skipRef.current)
             skipRef.current = null
-            setSkipRate(0)
+            switch (skipRate) {
+                default:
+                    return
+                case 0:
+                    setSkipRate(1);
+                    break
+                case 1:
+                    setSkipRate(2);
+                    break
+                case 2:
+                    setSkipRate(4)
+            }
+            skipRef.current = setInterval(() => {
+                instanceOfPlayer.currentTime -= 10 * skipRate
+            }, 1000)
+            console.log('rewind to: ', instanceOfPlayer.currentTime);
         }
-        switch (skipRate) {
-            default:
-                return
-            case 0:
-                setSkipRate(1);
-                break
-            case 1:
-                setSkipRate(2);
-                break
-            case 2:
-                setSkipRate(4)
-        }
-        skipRef.current = setInterval(() => {
-            instanceOfPlayer.currentTime += 10 * skipRate
-        }, 1000)
-        console.log('fast forward to: ', instanceOfPlayer.currentTime);
     }
 
+    //Funzionalità del tasto fast forward
+    const onFastForward = () => {
+        if (!displayControls) {
+            pauseSpatialNavigation()
+            setDisplayControls(true)
+            clearTimeout(controlsCountdownRef.current);
+            controlsCountdownRef.current = null;
+            controlsCountdownRef.current = setTimeout(() => {
+                setDisplayControls(false);
+                pauseSpatialNavigation();
+            }, controlsCountdownFromConfig)
+        } else {
+            controlRef.current = 'fast-forward';
+            if (controlRef.current !== 'fast-forward') {
+                clearInterval(skipRef.current)
+                skipRef.current = null
+                setSkipRate(0)
+            }
+            switch (skipRate) {
+                default:
+                    return
+                case 0:
+                    setSkipRate(1);
+                    break
+                case 1:
+                    setSkipRate(2);
+                    break
+                case 2:
+                    setSkipRate(4)
+            }
+            skipRef.current = setInterval(() => {
+                instanceOfPlayer.currentTime += 10 * skipRate
+
+            }, 1000)
+            console.log('fast forward to: ', instanceOfPlayer.currentTime);
+        }
+    }
+
+
+    //Gestione estetica del focus sui tasti
+    const highlightRewind = () => {
+        setIsHighlighted({ play: false, forward: false, rewind: true });
+    };
+
+    const highlightPlay = () => {
+        setIsHighlighted({ play: true, forward: false, rewind: false });
+    };
+
+    const highlightFastForward = () => {
+        setIsHighlighted({ play: false, forward: true, rewind: false });
+    };
+    ///////////////////////////////////////
+
+
+    //Render del componente
     return (
-        <div className='controls-and-progress-bar' style={{ visibility: `${displayControls ? 'visible' : 'hidden'}` }}>
+        <div className={`${displayControls ? 'fade-in' : 'fade-out'} controls-and-progress-bar`}>
             <ProgressBarView duration={duration} currentTime={currentTime} />
             <AntaresHorizontalList containerClassname='controls-outer'
                 innerClassname='controls-inner'
@@ -160,26 +244,31 @@ const Controls = ({ focusTo, instanceOfPlayer, playerState, duration, currentTim
                     focusableId='rewind-button'
                     focusedClassname='controls-button-focused'
                     index={0}
-                    onEnterDown={onRewind}>
-                    <span>Rewind {`x${skipRate}`}</span>
+                    onEnterDown={onRewind}
+                    onFocus={highlightRewind}>
+                    <img alt='rewind-icon' src={isHighlighted.rewind ? HighlightedRewind : Rewind} />
+                    <span className='rewind-skiprate'>{`x${skipRate}`}</span>
                 </AntaresFocusable>
                 <AntaresFocusable
                     classname='play-button controls-button'
                     focusedClassname='controls-button-focused'
                     focusableId='play-button'
                     index={1}
-                    onEnterDown={playOrPause}>
-                    <span>Play/Pause</span>
+                    onEnterDown={playOrPause}
+                    onFocus={highlightPlay}>
+                    <img alt='play/pause icon' src={playerState === 'playing' ? isHighlighted.play ? HighlightedPause : Pause : isHighlighted.play ? HighlightedPlay : Play} className='controls-icon' />
                 </AntaresFocusable>
-                <AntaresFocusable classname='controls-button rewind'
+                <AntaresFocusable classname='controls-button fast-forward'
                     focusableId='fast-forward-button'
                     focusedClassname='controls-button-focused'
                     index={2}
-                    onEnterDown={onFastForward}>
-                    <span>Fast Forward {`x${skipRate}`}</span>
+                    onEnterDown={onFastForward}
+                    onFocus={highlightFastForward}>
+                    <span className='fast-forward-skiprate'>{`x${skipRate}`}</span>
+                    <img alt='fast-forward-icon' src={isHighlighted.forward ? HighlightedFastForward : FastForward} className='controls-icon' />
                 </AntaresFocusable>
             </AntaresHorizontalList>
-        </div>
+        </div >
     )
 }
 

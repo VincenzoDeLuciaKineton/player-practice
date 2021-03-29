@@ -1,3 +1,7 @@
+.controls-and-progress-bar {
+    background-color: transparent;
+}
+
 .controls-outer{
     display: flex;
     flex-direction: row;
@@ -22,20 +26,65 @@
     margin: 0px 20px;
     text-align: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
+    color: white;
 }
 
 .controls-button-focused {
     width: 200px !important;
     height: 80px !important;
-    background-color: yellow;
     margin: 0px 20px;
     text-align: center;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
+    color: white;
+}
+
+.rewind-skiprate{
+    margin-left: 8px;
+}
+
+.fast-forward-skiprate {
+    margin-right: 8px;
+}
+
+.fade-in {
+	opacity: 1;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 0.5s;
+    animation-fill-mode: forwards
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+.fade-out {
+	opacity: 1;
+	animation-name: fadeOutOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 0.5s;
+    animation-fill-mode: forwards
+}
+
+@keyframes fadeOutOpacity {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 

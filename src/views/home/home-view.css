@@ -1,6 +1,6 @@
 .home-outer {
-    width: 300px !important;
-    height: 100px !important;
+    width: 400px !important;
+    height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
@@ -8,8 +8,8 @@
 }
 
 .home-inner {
-    width: 300px !important;
-    height: 100px !important;
+    width: 400px !important;
+    height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
@@ -18,21 +18,24 @@
 
 .home-button {
     font-size: 40px ;
-    width: 300px !important;
-    font-size: 100px !important;
+    width: 400px !important;
+    height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center!important;
+    padding: 20px;
 }
 
-.focused-home-button {
+.home-button-focused {
     font-size: 40px;
-    width: 300px !important;
-    height: 100px !important;
+    width: 400px !important;
+    height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center!important;
-    background-color: yellow;
+    background-color: #3184c3;
+    color: white;
+    padding: 20px;
 }
