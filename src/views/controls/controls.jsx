@@ -18,7 +18,7 @@ import HighlightedRewind from "../assets/images/bw-focus.png";
 ///////////////////////////////
 
 //Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la Ref che registra gli stati del player, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player, utilities di Antares per la navigazione.
-const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
+const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
 
     //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
     const { setReadyToPlay, controlsCountdownFromConfig } = useContext(ConfigContext)
@@ -31,8 +31,6 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Variabile di stato che decreta se ad essere mostrata è l'icona pause(isPlaying===true) o l'icona play(isPlaying===false).
     const [isPlaying, setIsPlaying] = useState(true);
 
-    //Variabile di stato che decreta di quanto debba andare avanti il fast forward o indietro il rewind ad ogni set dell'intervallo.
-    const [seekRate, setSeekRate] = useState(1);
 
     //Variabile di stato che regola quale dei controlli sia quello in focus.
     const [isHighlighted, setIsHighlighted] = useState({
@@ -42,7 +40,10 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     });
 
     //Ref che indica se il player sia in seeking o meno
-    const seekingRef = useRef(null);
+    const seekingRef = useRef(false);
+
+    //Ref che decreta di quanto debba andare avanti il fast forward o indietro il rewind per ogni iterazione dell'intervallo.
+    const seekrateRef = useRef(0);
 
     //Ref che indica quale sia il comando che i controlli stanno inviando al player
     const controlRef = useRef('play');
@@ -70,15 +71,14 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     ///////////////////////////////////////////////////
 
     //useEffect per monitorare gli stati del player
-    useEffect(() => {
+    /* useEffect(() => {
         console.log('playerState: ', playerState);
         console.log('Is the player paused?', instanceOfPlayer.paused);
-    }, [playerState, instanceOfPlayer.paused])
+    }, [playerState, instanceOfPlayer.paused]) */
     ///////////////////////////////////////////////
 
     //Funzione che resetta il countdown per nascondere i controlli dopo ogni keypress
     const resetControlsCountdown = () => {
-        console.log('Controls countdown restarted')
         clearTimeout(controlsCountdownRef.current);
         controlsCountdownRef.current = null;
         controlsCountdownRef.current = setTimeout(() => {
@@ -96,7 +96,6 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             e.keyCode === 38 ||
             e.keyCode === 40
         ) {
-            console.log('Resetting controls timeout')
             if (!displayControls) {
                 setDisplayControls(true);
                 resetControlsCountdown();
@@ -111,7 +110,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                 setDisplayControls(false);
             } else {
                 focusTo(parentFocusable);
-                console.log('parentFocusable: ', parentFocusable);
+                /* console.log('parentFocusable: ', parentFocusable); */
                 resumeSpatialNavigation();
                 setReadyToPlay(false);
                 setDisplayPlayer(false);
@@ -130,11 +129,19 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     }, [onKeyDownHandler]);
     //////////////////////////////////////////////////////
 
-
-    const stopSeeking = () => {
-        clearInterval(seekingRef.current)
-        seekingRef.current = null
+    //Funzione che ferma le azioni di rewind o fast forward in corso da chiamare prima di cominciare nuove azioni, in modo che le precedenti e le successive non vadano in contrasto.
+    const clearControls = () => {
+        seekrateRef.current = 0;
+        clearInterval(seekingRef.current);
+        seekingRef.current = null;
+        console.log('CLEARING INTERVAL FROM PLAY BUTTON')
     }
+
+    useEffect(() => {
+        console.log('CLEARING THE INTERVAL WITH useEffect')
+        clearInterval(seekingRef.current);
+        seekingRef.current = false;
+    }, [controlRef.current])
 
     //Funzionalità del tasto Play
     const playOrPause = () => {
@@ -142,13 +149,14 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             setDisplayControls(true);
             resetControlsCountdown();
         } else {
+            controlRef.current = 'play';
+            clearControls();
             setIsPlaying(!isPlaying)
             resetControlsCountdown();
-            stopSeeking();
-            setSeekRate(1);
             if (instanceOfPlayer.paused) {
                 instanceOfPlayer.play()
             } else {
+                controlRef.current = 'pause'
                 instanceOfPlayer.pause()
             }
         }
@@ -159,30 +167,39 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         if (!displayControls) {
             resetControlsCountdown();
         } else {
+            seekingRef.current = true;
             setIsPlaying(false);
             instanceOfPlayer.pause();
+
             controlRef.current = 'rewind';
-            if (controlRef.current !== 'rewind') {
-                stopSeeking();
-                setSeekRate(1);
-            }
-            stopSeeking();
-            switch (seekRate) {
-                default:
-                    return
+
+            switch (seekrateRef.current) {
                 case 0:
-                    setSeekRate(1);
-                    break
-                case 1:
-                    setSeekRate(2);
-                    break
+                    seekrateRef.current = 2;
+                    break;
                 case 2:
-                    setSeekRate(4)
+                    seekrateRef.current = 4;
+                    break;
+                case 4:
+                    seekrateRef.current = 8;
+                    break;
+                default:
+                    return;
             }
+
             seekingRef.current = setInterval(() => {
-                instanceOfPlayer.currentTime -= 10 * seekRate
+                console.log('SKIPPING BACKWARDS');
+                instanceOfPlayer.currentTime -= 5 * seekrateRef.current;
+                resetControlsCountdown()
+                if (seekToRef.current <= 0) {
+                    //Comportamento al raggiungimento dello 0 durante il rewind.
+                    console.log('LEFT EDGE REACHED');
+                    seekToRef.current = instanceOfPlayer.currentTime;
+                    controlRef.current = 'play';
+                    instanceOfPlayer.play();
+                    focusTo('play-button')
+                }
             }, 1000)
-            console.log('rewind to: ', instanceOfPlayer.currentTime);
         }
     }
 
@@ -191,47 +208,47 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         if (!displayControls) {
             resetControlsCountdown()
         } else {
+            seekingRef.current = true;
             setIsPlaying(false);
             instanceOfPlayer.pause();
 
             if (controlRef.current !== 'fast-forward') {
                 clearInterval(seekingRef.current)
                 seekingRef.current = null
-                setSeekRate(0)
+                seekrateRef.current = 0;
             }
 
             controlRef.current = 'fast-forward';
 
-            switch (seekRate) {
+            switch (seekrateRef.current) {
                 default:
-                    return
-                case 0:
-                    setSeekRate(1);
-                    break
-                case 1:
-                    setSeekRate(2);
-                    break
+                    seekrateRef.current = 2;
+                    break;
                 case 2:
-                    setSeekRate(4)
+                    seekrateRef.current = 4;
+                    break
+                case 4:
+                    seekrateRef.current = 8;
             }
 
-            seekingRef.current = setInterval(() => {
-                if (seekToRef.current <= duration) {
-                    seekToRef.current += 10 * seekRate;
-                    instanceOfPlayer.currentTime = seekToRef.current;
-                    resetControlsCountdown()
-                } else {
-                    focusTo(parentFocusable);
-                    seekToRef.current = null;
-                    console.log('parentFocusable: ', parentFocusable);
-                    setReadyToPlay(false);
-                    setDisplayPlayer(false);
-                    resumeSpatialNavigation();
-                    clearInterval(seekingRef.current);
-                    seekingRef.current = null;
-                }
+            if (seekingRef.current === null) {
+                seekingRef.current = setInterval(() => {
+                    seekToRef.current = instanceOfPlayer.currentTime;
+                    if (seekToRef.current < duration) {
+                        console.log('SKIPPING FORWARD')
+                        resetControlsCountdown()
+                        seekToRef.current += 5 * seekrateRef.current;
+                    } /* else {
+                        console.log('RIGHT EDGE REACHED')
+                        focusTo(parentFocusable);
+                        setReadyToPlay(false);
+                        setDisplayPlayer(false);
+                        resumeSpatialNavigation();
+                    } */
 
-            }, 1000)
+                }, 1000)
+            }
+
             console.log('fast forward to: ', instanceOfPlayer.currentTime);
         }
     }
@@ -271,11 +288,11 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     onEnterDown={onRewind}
                     onFocus={highlightRewind}>
                     <img alt='rewind-icon' src={isHighlighted.rewind ? HighlightedRewind : Rewind} />
-                    <span className='rewind-skiprate'
+                    <span className='seekrate rewind-seekrate'
                         style={{
                             opacity: `${controlRef.current === 'rewind' ? '1' : '0'}`,
-                            color: `${isHighlighted.forward ? '#3184c3' : 'white'}`
-                        }}>{`x${seekRate}`}</span>
+                            color: `${isHighlighted.rewind ? 'black' : 'black'}`
+                        }}>{`x${seekrateRef.current}`}</span>
                 </AntaresFocusable>
                 <AntaresFocusable
                     classname='play-button controls-button'
@@ -292,11 +309,11 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     index={2}
                     onEnterDown={onFastForward}
                     onFocus={highlightFastForward}>
-                    <span className='fast-forward-skiprate'
+                    <span className='seekrate fast-forward-seekrate'
                         style={{
                             opacity: `${controlRef.current === 'fast-forward' ? '1' : '0'}`,
-                            color: `${isHighlighted.forward ? '#3184c3' : 'white'}`
-                        }}>{`x${seekRate}`}</span>
+                            color: `${isHighlighted.forward ? 'black' : 'black'}`
+                        }}>{`x${seekrateRef.current}`}</span>
                     <img alt='fast-forward-icon' src={isHighlighted.forward ? HighlightedFastForward : FastForward} className='controls-icon' />
                 </AntaresFocusable>
             </AntaresHorizontalList>

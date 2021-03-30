@@ -63,6 +63,10 @@
     animation-fill-mode: forwards
 }
 
+.seekrate {
+    font-size: 30px;
+}
+
 @keyframes fadeInOpacity {
 	0% {
 		opacity: 0;

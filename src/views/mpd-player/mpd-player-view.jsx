@@ -97,7 +97,7 @@ const MpdPlayerView = () => {
         <div className='video-and-controls'>
             <video id="videoPlayer" ref={playerRef} autoplay='true'></video>
             {duration > 0 ?
-                <Controls instanceOfPlayer={playerRef.current} playerState={playerStateRef.current} currentTime={currentTime} duration={duration} /> : null}
+                <Controls instanceOfPlayer={playerRef.current} playerState={playerStateRef.current} currentTime={currentTime} setCurrentTime={setCurrentTime} duration={duration} /> : null}
         </div>
     )
 }
