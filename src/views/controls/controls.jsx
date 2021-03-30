@@ -50,6 +50,8 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Ref a cui viene assegnato il countdown per far scomparire i controlli dopo ogni keypress
     const controlsCountdownRef = useRef(null);
 
+    const seekToRef = useRef(instanceOfPlayer.currentTime);
+
     //Variabile a cui verranno assegnati i keydownHandler.
     let onKeyDown = undefined;
 
@@ -157,6 +159,8 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         if (!displayControls) {
             resetControlsCountdown();
         } else {
+            setIsPlaying(false);
+            instanceOfPlayer.pause();
             controlRef.current = 'rewind';
             if (controlRef.current !== 'rewind') {
                 stopSeeking();
@@ -187,12 +191,17 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         if (!displayControls) {
             resetControlsCountdown()
         } else {
-            controlRef.current = 'fast-forward';
+            setIsPlaying(false);
+            instanceOfPlayer.pause();
+
             if (controlRef.current !== 'fast-forward') {
                 clearInterval(seekingRef.current)
                 seekingRef.current = null
                 setSeekRate(0)
             }
+
+            controlRef.current = 'fast-forward';
+
             switch (seekRate) {
                 default:
                     return
@@ -205,14 +214,21 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                 case 2:
                     setSeekRate(4)
             }
+
             seekingRef.current = setInterval(() => {
-                instanceOfPlayer.currentTime += 10 * seekRate
-                if (instanceOfPlayer.currentTime >= duration) {
+                if (seekToRef.current <= duration) {
+                    seekToRef.current += 10 * seekRate;
+                    instanceOfPlayer.currentTime = seekToRef.current;
+                    resetControlsCountdown()
+                } else {
                     focusTo(parentFocusable);
+                    seekToRef.current = null;
                     console.log('parentFocusable: ', parentFocusable);
                     setReadyToPlay(false);
                     setDisplayPlayer(false);
                     resumeSpatialNavigation();
+                    clearInterval(seekingRef.current);
+                    seekingRef.current = null;
                 }
 
             }, 1000)
@@ -255,7 +271,11 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     onEnterDown={onRewind}
                     onFocus={highlightRewind}>
                     <img alt='rewind-icon' src={isHighlighted.rewind ? HighlightedRewind : Rewind} />
-                    <span className='rewind-skiprate'>{`x${seekRate}`}</span>
+                    <span className='rewind-skiprate'
+                        style={{
+                            opacity: `${controlRef.current === 'rewind' ? '1' : '0'}`,
+                            color: `${isHighlighted.forward ? '#3184c3' : 'white'}`
+                        }}>{`x${seekRate}`}</span>
                 </AntaresFocusable>
                 <AntaresFocusable
                     classname='play-button controls-button'
@@ -272,7 +292,11 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     index={2}
                     onEnterDown={onFastForward}
                     onFocus={highlightFastForward}>
-                    <span className='fast-forward-skiprate'>{`x${seekRate}`}</span>
+                    <span className='fast-forward-skiprate'
+                        style={{
+                            opacity: `${controlRef.current === 'fast-forward' ? '1' : '0'}`,
+                            color: `${isHighlighted.forward ? '#3184c3' : 'white'}`
+                        }}>{`x${seekRate}`}</span>
                     <img alt='fast-forward-icon' src={isHighlighted.forward ? HighlightedFastForward : FastForward} className='controls-icon' />
                 </AntaresFocusable>
             </AntaresHorizontalList>

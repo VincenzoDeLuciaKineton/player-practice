@@ -21,6 +21,7 @@ const MpdPlayerView = () => {
         if (url && readyToPlay) {
             initializedPlayer.initialize(playerRef.current, url, true);
             playerRef.current.addEventListener('durationchange', onDurationChange)
+            playerRef.current.addEventListener('ended', onEnded);
             playerRef.current.addEventListener('loadeddata', onLoadedData)
             playerRef.current.addEventListener('pause', onPause)
             playerRef.current.addEventListener('play', onPlay)
@@ -55,8 +56,13 @@ const MpdPlayerView = () => {
         }
     }
 
+    const onEnded = () => {
+        console.log('Event from the player: ended');
+        playerStateRef.current = 'ended';
+    }
+
     const onLoadedData = () => {
-        console.log('Event from the player: Loaded Data')
+        console.log('Event from the player: loadeddata')
         playerStateRef.current = 'loadeddata'
     }
 
