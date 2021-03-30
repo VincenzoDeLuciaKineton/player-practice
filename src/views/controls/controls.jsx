@@ -39,21 +39,20 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
 
     //Funzione che resetta il countdown per nascondere i controlli
     const resetControlsCountdown = () => {
+        console.log('Controls countdown restarted')
         clearTimeout(controlsCountdownRef.current);
         controlsCountdownRef.current = null;
         controlsCountdownRef.current = setTimeout(() => {
             setDisplayControls(false);
-            //pauseSpatialNavigation();
+            pauseSpatialNavigation();
             console.log('resetControlsCountdown displayControls: ', displayControls)
         }, controlsCountdownFromConfig)
     }
 
     // useEffect di mount
     useEffect(() => {
-        focusTo('play-button')
-        controlsCountdownRef.current = setTimeout(() => {
-            resetControlsCountdown();
-        }, controlsCountdownFromConfig)
+        focusTo('play-button');
+        resetControlsCountdown();
 
         return () => {
             clearTimeout(controlsCountdownRef.current);
@@ -61,12 +60,9 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         }
 
     }, [])
+    ///////////////////////////////////////////////////
 
-    /* useEffect(() => {
-        console.log('PlayerState from the controls: ', playerState)
-    }, [playerState]) */
-
-    //Mapping dei controlli che non sono di navigazione 
+    //Comportamento dei controlli, differenziato tra quando essi sono visibili e quando non lo sono 
     const onKeyDownHandler = (e) => {
         if (
             e.keyCode === 37 ||
@@ -77,14 +73,10 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             console.log('Resetting controls timeout')
             if (!displayControls) {
                 setDisplayControls(true);
+                resetControlsCountdown();
             } else {
                 resumeSpatialNavigation();
-                clearTimeout(controlsCountdownRef.current);
-                controlsCountdownRef.current = null;
-                controlsCountdownRef.current = setTimeout(() => {
-                    setDisplayControls(false);
-                    //pauseSpatialNavigation();
-                }, controlsCountdownFromConfig)
+                resetControlsCountdown();
             }
 
         }
@@ -92,13 +84,9 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
             if (displayControls) {
                 setDisplayControls(false);
             } else {
-                console.log('parentFocusable: ', parentFocusable)
-                /* setUrl(null); */
-                resumeSpatialNavigation()
-                setTimeout(() => {
-                    focusTo('home-button')
-                    console.log('partneFocusable from the setTimeout: ', parentFocusable)
-                }, 3000);
+                focusTo(parentFocusable);
+                console.log('parentFocusable: ', parentFocusable);
+                resumeSpatialNavigation();
                 setReadyToPlay(false);
                 setDisplayPlayer(false);
             }
@@ -119,14 +107,10 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Funzionalità del tasto Play
     const playOrPause = () => {
         if (!displayControls) {
-            setDisplayControls(true)
-            clearTimeout(controlsCountdownRef.current);
-            controlsCountdownRef.current = null;
-            controlsCountdownRef.current = setTimeout(() => {
-                setDisplayControls(false);
-                //pauseSpatialNavigation();
-            }, controlsCountdownFromConfig)
+            setDisplayControls(true);
+            resetControlsCountdown();
         } else {
+            resetControlsCountdown();
             clearInterval(skipRef.current)
             skipRef.current = null
             setSkipRate(1)
@@ -143,14 +127,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Funzionalità del tasto rewind
     const onRewind = () => {
         if (!displayControls) {
-            //pauseSpatialNavigation()
-            setDisplayControls(true)
-            clearTimeout(controlsCountdownRef.current);
-            controlsCountdownRef.current = null;
-            controlsCountdownRef.current = setTimeout(() => {
-                setDisplayControls(false);
-                //pauseSpatialNavigation();
-            }, controlsCountdownFromConfig)
+            resetControlsCountdown()
         } else {
             controlRef.current = 'rewind';
             if (controlRef.current !== 'rewind') {
@@ -182,14 +159,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Funzionalità del tasto fast forward
     const onFastForward = () => {
         if (!displayControls) {
-            //pauseSpatialNavigation()
-            setDisplayControls(true)
-            clearTimeout(controlsCountdownRef.current);
-            controlsCountdownRef.current = null;
-            controlsCountdownRef.current = setTimeout(() => {
-                setDisplayControls(false);
-                //pauseSpatialNavigation();
-            }, controlsCountdownFromConfig)
+            resetControlsCountdown()
         } else {
             controlRef.current = 'fast-forward';
             if (controlRef.current !== 'fast-forward') {

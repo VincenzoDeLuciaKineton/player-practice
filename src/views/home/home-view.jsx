@@ -13,7 +13,7 @@ const HomeView = ({ focusTo }) => {
     }, [])
 
     const onEnterDown = () => {
-        setParentFocusable('home-button');
+        setParentFocusable('home-button-id');
         setReadyToPlay(true);
         setDisplayPlayer(true);
     }
