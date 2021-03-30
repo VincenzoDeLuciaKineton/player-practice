@@ -26,6 +26,7 @@ const MpdPlayerView = () => {
             playerRef.current.addEventListener('play', onPlay)
             playerRef.current.addEventListener('playing', onPlaying)
             playerRef.current.addEventListener('timeupdate', onTimeUpdate)
+            playerRef.current.addEventListener('waiting', onWaiting)
         }
 
         return () => {
@@ -36,6 +37,7 @@ const MpdPlayerView = () => {
                 playerRef.current.removeEventListener('pause', onPause)
                 playerRef.current.removeEventListener('play', onPlay)
                 playerRef.current.removeEventListener('playing', onPlaying)
+                playerRef.current.addEventListener('waiting', onWaiting)
             }
             setReadyToPlay(false);
             playerStateRef.current = null;
@@ -59,25 +61,30 @@ const MpdPlayerView = () => {
     }
 
     const onPlay = () => {
-        console.log('Event from the player: Play')
+        console.log('Event from the player: play')
         playerStateRef.current = 'play'
     }
 
     const onPause = () => {
-        console.log('Event from the player: Pause')
+        console.log('Event from the player: pause')
         playerStateRef.current = 'pause'
     }
 
     const onPlaying = () => {
-        console.log('Event from the player: Playing')
+        console.log('Event from the player: playing')
         playerStateRef.current = 'playing'
     }
 
     const onTimeUpdate = () => {
         if (playerRef.current) {
             setCurrentTime(parseInt(playerRef.current.currentTime))
-            playerStateRef.current = 'timeupdate'
+            /* playerStateRef.current = 'timeupdate' */
         }
+    }
+
+    const onWaiting = () => {
+        console.log('Event from the player: playing');
+        playerStateRef.current = 'waiting'
     }
 
     return (

@@ -1,6 +1,6 @@
 .home-outer {
     width: 400px !important;
-    height: 125px !important;
+    height: 165px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
@@ -9,7 +9,7 @@
 
 .home-inner {
     width: 400px !important;
-    height: 125px !important;
+    height: 165px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;

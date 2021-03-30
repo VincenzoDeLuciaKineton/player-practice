@@ -13,18 +13,15 @@ const HomeView = ({ focusTo }) => {
     }, [])
 
     const onEnterDown = () => {
-        setParentFocusable('home-button-id');
+        setParentFocusable('home');
         setReadyToPlay(true);
         setDisplayPlayer(true);
     }
 
-    const onFocus = () => {
-        console.log('home button onFocus')
-    }
 
     return (
-        <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home'>
-            <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown} onFocus={onFocus}>
+        <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home' retainLastFocus={true}>
+            <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown}>
                 <span>Go to the player</span>
             </AntaresFocusable>
         </AntaresHorizontalList>

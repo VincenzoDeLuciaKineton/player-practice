@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from 'react'
-import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent } from 'antares'
 import './controls.css'
+import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent } from 'antares'
 import { PlayerContext } from '../../context/PlayerContext'
 import { ConfigContext } from '../../context/ConfigContext'
 import ProgressBarView from '../progress-bar/progress-bar-view'
@@ -15,39 +15,44 @@ import HighlightedPlay from "../assets/images/play-focus.png";
 import HighlightedPause from "../assets/images/pause-focus.png";
 import HighlightedFastForward from "../assets/images/fw-focus.png";
 import HighlightedRewind from "../assets/images/bw-focus.png";
+///////////////////////////////
 
+//Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la Ref che registra gli stati del player, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player, utilities di Antares per la navigazione.
 const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
+
     //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
     const { setReadyToPlay, controlsCountdownFromConfig } = useContext(ConfigContext)
     const { setDisplayPlayer, parentFocusable } = useContext(PlayerContext);
 
     //Stati: valori pertinenti al singolo componente/pagina il cui cambiamento causa un re-render
+    //Variabile di stato che decreta se i controlli siano visibili o meno. Al suo cambiamento è subordinata la visibility dell'intero componente, tramite le animazioni fade-in e fade-out.
     const [displayControls, setDisplayControls] = useState(true)
-    const [skipRate, setSkipRate] = useState(1);
+
+    //Variabile di stato che decreta se ad essere mostrata è l'icona pause(isPlaying===true) o l'icona play(isPlaying===false).
+    const [isPlaying, setIsPlaying] = useState(true);
+
+    //Variabile di stato che decreta di quanto debba andare avanti il fast forward o indietro il rewind ad ogni set dell'intervallo.
+    const [seekRate, setSeekRate] = useState(1);
+
+    //Variabile di stato che regola quale dei controlli sia quello in focus.
     const [isHighlighted, setIsHighlighted] = useState({
         play: true,
         forward: false,
         rewind: false,
     });
 
-    //Ref: valorri relativi al componente/pagina indipendenti dal ciclo di vita
-    const isPlayingRef = useRef(false)
-    const skipRef = useRef(null);
-    const controlRef = useRef('play')
-    const controlsCountdownRef = useRef(null)
+    //Ref che indica se il player sia in seeking o meno
+    const seekingRef = useRef(null);
+
+    //Ref che indica quale sia il comando che i controlli stanno inviando al player
+    const controlRef = useRef('play');
+
+    //Ref a cui viene assegnato il countdown per far scomparire i controlli dopo ogni keypress
+    const controlsCountdownRef = useRef(null);
+
+    //Variabile a cui verranno assegnati i keydownHandler.
     let onKeyDown = undefined;
 
-    //Funzione che resetta il countdown per nascondere i controlli
-    const resetControlsCountdown = () => {
-        console.log('Controls countdown restarted')
-        clearTimeout(controlsCountdownRef.current);
-        controlsCountdownRef.current = null;
-        controlsCountdownRef.current = setTimeout(() => {
-            setDisplayControls(false);
-            pauseSpatialNavigation();
-            console.log('resetControlsCountdown displayControls: ', displayControls)
-        }, controlsCountdownFromConfig)
-    }
 
     // useEffect di mount
     useEffect(() => {
@@ -62,7 +67,26 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     }, [])
     ///////////////////////////////////////////////////
 
-    //Comportamento dei controlli, differenziato tra quando essi sono visibili e quando non lo sono 
+    //useEffect per monitorare gli stati del player
+    useEffect(() => {
+        console.log('playerState: ', playerState);
+        console.log('Is the player paused?', instanceOfPlayer.paused);
+    }, [playerState, instanceOfPlayer.paused])
+    ///////////////////////////////////////////////
+
+    //Funzione che resetta il countdown per nascondere i controlli dopo ogni keypress
+    const resetControlsCountdown = () => {
+        console.log('Controls countdown restarted')
+        clearTimeout(controlsCountdownRef.current);
+        controlsCountdownRef.current = null;
+        controlsCountdownRef.current = setTimeout(() => {
+            setDisplayControls(false);
+            pauseSpatialNavigation();
+        }, controlsCountdownFromConfig)
+    }
+    //////////////////////////////////////////////
+
+    //Comportamento delle frecce direzionali e del tasto Back, differenziato tra quando i controlli sono visibili e quando non lo sono. La navigazione spaziale dei tasti direzionali, tuttavia, è gestita da Antares.
     const onKeyDownHandler = (e) => {
         if (
             e.keyCode === 37 ||
@@ -104,21 +128,25 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     }, [onKeyDownHandler]);
     //////////////////////////////////////////////////////
 
+
+    const stopSeeking = () => {
+        clearInterval(seekingRef.current)
+        seekingRef.current = null
+    }
+
     //Funzionalità del tasto Play
     const playOrPause = () => {
         if (!displayControls) {
             setDisplayControls(true);
             resetControlsCountdown();
         } else {
+            setIsPlaying(!isPlaying)
             resetControlsCountdown();
-            clearInterval(skipRef.current)
-            skipRef.current = null
-            setSkipRate(1)
-            if (!isPlayingRef.current) {
-                isPlayingRef.current = true
+            stopSeeking();
+            setSeekRate(1);
+            if (instanceOfPlayer.paused) {
                 instanceOfPlayer.play()
             } else {
-                isPlayingRef.current = false
                 instanceOfPlayer.pause()
             }
         }
@@ -127,30 +155,28 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     //Funzionalità del tasto rewind
     const onRewind = () => {
         if (!displayControls) {
-            resetControlsCountdown()
+            resetControlsCountdown();
         } else {
             controlRef.current = 'rewind';
             if (controlRef.current !== 'rewind') {
-                clearInterval(skipRef.current)
-                skipRef.current = null
-                setSkipRate(1)
+                stopSeeking();
+                setSeekRate(1);
             }
-            clearInterval(skipRef.current)
-            skipRef.current = null
-            switch (skipRate) {
+            stopSeeking();
+            switch (seekRate) {
                 default:
                     return
                 case 0:
-                    setSkipRate(1);
+                    setSeekRate(1);
                     break
                 case 1:
-                    setSkipRate(2);
+                    setSeekRate(2);
                     break
                 case 2:
-                    setSkipRate(4)
+                    setSeekRate(4)
             }
-            skipRef.current = setInterval(() => {
-                instanceOfPlayer.currentTime -= 10 * skipRate
+            seekingRef.current = setInterval(() => {
+                instanceOfPlayer.currentTime -= 10 * seekRate
             }, 1000)
             console.log('rewind to: ', instanceOfPlayer.currentTime);
         }
@@ -163,24 +189,31 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
         } else {
             controlRef.current = 'fast-forward';
             if (controlRef.current !== 'fast-forward') {
-                clearInterval(skipRef.current)
-                skipRef.current = null
-                setSkipRate(0)
+                clearInterval(seekingRef.current)
+                seekingRef.current = null
+                setSeekRate(0)
             }
-            switch (skipRate) {
+            switch (seekRate) {
                 default:
                     return
                 case 0:
-                    setSkipRate(1);
+                    setSeekRate(1);
                     break
                 case 1:
-                    setSkipRate(2);
+                    setSeekRate(2);
                     break
                 case 2:
-                    setSkipRate(4)
+                    setSeekRate(4)
             }
-            skipRef.current = setInterval(() => {
-                instanceOfPlayer.currentTime += 10 * skipRate
+            seekingRef.current = setInterval(() => {
+                instanceOfPlayer.currentTime += 10 * seekRate
+                if (instanceOfPlayer.currentTime >= duration) {
+                    focusTo(parentFocusable);
+                    console.log('parentFocusable: ', parentFocusable);
+                    setReadyToPlay(false);
+                    setDisplayPlayer(false);
+                    resumeSpatialNavigation();
+                }
 
             }, 1000)
             console.log('fast forward to: ', instanceOfPlayer.currentTime);
@@ -188,7 +221,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
     }
 
 
-    //Gestione estetica del focus sui tasti
+    //Gestione estetica del focus sui tasti triggerata sull'onFocus dei singoli tasti
     const highlightRewind = () => {
         setIsHighlighted({ play: false, forward: false, rewind: true });
     };
@@ -222,7 +255,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     onEnterDown={onRewind}
                     onFocus={highlightRewind}>
                     <img alt='rewind-icon' src={isHighlighted.rewind ? HighlightedRewind : Rewind} />
-                    <span className='rewind-skiprate'>{`x${skipRate}`}</span>
+                    <span className='rewind-skiprate'>{`x${seekRate}`}</span>
                 </AntaresFocusable>
                 <AntaresFocusable
                     classname='play-button controls-button'
@@ -231,7 +264,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     index={1}
                     onEnterDown={playOrPause}
                     onFocus={highlightPlay}>
-                    <img alt='play/pause icon' src={playerState === 'playing' ? isHighlighted.play ? HighlightedPause : Pause : isHighlighted.play ? HighlightedPlay : Play} className='controls-icon' />
+                    <img alt='play/pause icon' src={isPlaying ? (isHighlighted.play ? HighlightedPause : Pause) : (isHighlighted.play ? HighlightedPlay : Play)} className='controls-icon' />
                 </AntaresFocusable>
                 <AntaresFocusable classname='controls-button fast-forward'
                     focusableId='fast-forward-button'
@@ -239,7 +272,7 @@ const Controls = ({ instanceOfPlayer, playerState, duration, currentTime, focusT
                     index={2}
                     onEnterDown={onFastForward}
                     onFocus={highlightFastForward}>
-                    <span className='fast-forward-skiprate'>{`x${skipRate}`}</span>
+                    <span className='fast-forward-skiprate'>{`x${seekRate}`}</span>
                     <img alt='fast-forward-icon' src={isHighlighted.forward ? HighlightedFastForward : FastForward} className='controls-icon' />
                 </AntaresFocusable>
             </AntaresHorizontalList>

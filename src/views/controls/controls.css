@@ -1,5 +1,7 @@
 .controls-and-progress-bar {
+    position: relative;
     background-color: transparent;
+    z-index: 3;
 }
 
 .controls-outer{
