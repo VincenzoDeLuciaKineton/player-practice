@@ -20,7 +20,7 @@ const HomeView = ({ focusTo }) => {
 
 
     return (
-        <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home' retainLastFocus={true}>
+        <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home' retainLastFocus={true} innerWidth={500}>
             <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown}>
                 <span>Go to the player</span>
             </AntaresFocusable>

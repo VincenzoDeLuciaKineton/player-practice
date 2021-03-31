@@ -1,5 +1,5 @@
 .home-outer {
-    width: 400px !important;
+    width: 500px !important;
     height: 165px !important;
     display: flex !important;
     flex-direction: row !important;
@@ -8,7 +8,7 @@
 }
 
 .home-inner {
-    width: 400px !important;
+    width: 500px !important;
     height: 165px !important;
     display: flex !important;
     flex-direction: row !important;
@@ -18,7 +18,7 @@
 
 .home-button {
     font-size: 40px ;
-    width: 400px !important;
+    width: 500px !important;
     height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
@@ -29,7 +29,7 @@
 
 .home-button-focused {
     font-size: 40px;
-    width: 400px !important;
+    width: 500px !important;
     height: 125px !important;
     display: flex !important;
     flex-direction: row !important;

@@ -19,7 +19,7 @@ const ProgressBarView = ({ duration, currentTime }) => {
     };
 
     useEffect(() => {
-        setProgress(Math.floor(((currentTime / duration) * 100) * 1280) / 100)
+        setProgress(Math.floor(((currentTime / duration) * 1280)))
     }, [currentTime, duration])
 
     return (
