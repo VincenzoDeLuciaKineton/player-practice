@@ -67,6 +67,8 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
         return () => {
             clearTimeout(controlsCountdownRef.current);
             controlsCountdownRef.current = null;
+            clearInterval(seekingRef.current);
+            seekingRef.current = null;
         }
 
     }, [])
@@ -199,16 +201,17 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 //Fast forward
                 if (command === 'fast-forward') {
                     if (seekToRef.current < duration - (5 * seekrateRef.current)) {
-                        seekToRef.current += 5 * seekrateRef.current;
-                        setSeekTo(seekToRef.current);
-                        console.log('Forwarding seekTo to: ', seekToRef.current)
-                        console.log('seekingRef.current: ', seekingRef.current);
-                    } else if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
-                        console.log('LAST FORWARD')
-                        seekToRef.current = duration;
-                        setSeekTo(seekToRef.current);
-                    }
-                    else if (seekToRef.current === duration) {
+                        if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
+                            seekToRef.current += 5 * seekrateRef.current;
+                            setSeekTo(seekToRef.current);
+                            console.log('Forwarding seekTo to: ', seekToRef.current)
+                            console.log('seekingRef.current: ', seekingRef.current);
+                        } else {
+                            console.log('LAST FORWARD, ', seekToRef.current, duration);
+                            seekToRef.current = duration;
+                            setSeekTo(seekToRef.current);
+                        }
+                    } else {
                         resumeSpatialNavigation();
                         focusTo(parentFocusable);
                         setReadyToPlay(false);
