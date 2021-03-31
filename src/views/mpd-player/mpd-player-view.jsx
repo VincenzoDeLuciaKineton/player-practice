@@ -5,6 +5,7 @@ import { ConfigContext } from '../../context/ConfigContext'
 import { PlayerContext } from '../../context/PlayerContext'
 import Controls from '../controls/controls'
 import LoaderView from '../loader/loader-view'
+import SpinnerView from '../spinner/spinner-view'
 
 const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
@@ -14,6 +15,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [showLoader, setShowLoader] = useState(true);
+    const [buffering, setBuffering] = useState(false);
 
 
     const playerRef = useRef(null);
@@ -89,6 +91,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const onPlaying = () => {
         console.log('Event from the player: playing at', playerRef.current.currentTime)
         playerStateRef.current = 'playing';
+        setBuffering(false);
     }
 
     const onTimeUpdate = () => {
@@ -100,14 +103,24 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const onWaiting = () => {
         console.log('Event from the player: waiting');
         playerStateRef.current = 'waiting';
+        setBuffering(true);
     }
 
     return (
         <div className='video-and-controls'>
+
             {showLoader ? <LoaderView /> : null}
             <video id="videoPlayer" ref={playerRef} autoPlay={true}></video>
             {duration > 0 && !showLoader ?
-                <Controls instanceOfPlayer={playerRef.current} playerState={playerStateRef.current} currentTime={currentTime} setCurrentTime={setCurrentTime} duration={duration} /> : null}
+                (buffering ?
+                    <SpinnerView /> :
+                    <Controls
+                        instanceOfPlayer={playerRef.current}
+                        playerState={playerStateRef.current}
+                        currentTime={currentTime}
+                        setCurrentTime={setCurrentTime}
+                        duration={duration} />) :
+                null}
         </div>
     )
 }

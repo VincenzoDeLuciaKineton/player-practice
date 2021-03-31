@@ -17,7 +17,7 @@ import HighlightedRewind from "../assets/images/bw-focus.png";
 import HighlightedFastForward from "../assets/images/fw-focus.png";
 ///////////////////////////////
 
-//Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la Ref che registra gli stati del player, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player, utilities di Antares per la navigazione.
+//Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player (currentTime), la funzione per aggiornare il suddetto tempo e infine utilities di Antares per la navigazione.
 const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
 
     //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
@@ -31,8 +31,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     //Variabile di stato che decreta se ad essere mostrata è l'icona pause(isPlaying===true) o l'icona play(isPlaying===false).
     const [isPlaying, setIsPlaying] = useState(true);
 
-
-    //Variabile di stato che regola quale dei controlli sia quello in focus.
+    //Variabile di stato che regola esteticamente quale dei controlli sia quello in focus.
     const [isHighlighted, setIsHighlighted] = useState({
         play: true,
         forward: false,
@@ -42,8 +41,9 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     //Ref che indica se il player sia in seeking o meno; quando è in seeking sarà una setInterval, quando non lo è sarà null.
     const seekingRef = useRef(null);
 
-    //Ref che decreta di quanto debba andare avanti il fast forward o indietro il rewind per ogni iterazione dell'intervallo.
+    //Ref e variabile di stato che decretano di quanto debba andare avanti o indietro la currentTime ad ogni intervallo della funzione di fast forward o rewind. La ref mantiene il valore aggiornato, mentre aggiornare lo stato triggera il re-render.
     const seekrateRef = useRef(2);
+    const [seekRate, setSeekRate] = useState(2);
 
     //Ref che indica quale sia l'ultimo comando inviato dai controlli al player
     const controlRef = useRef('play');
@@ -70,8 +70,8 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
         }
 
     }, [])
-    ///////////////////////////////////////////////////
 
+    ///////////////////////////////////////////////////
     //useEffect per monitorare gli stati del player
     /* useEffect(() => {
         console.log('playerState: ', playerState, currentTime);
@@ -88,9 +88,8 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             pauseSpatialNavigation();
         }, controlsCountdownFromConfig)
     }
-    //////////////////////////////////////////////
 
-    //Comportamento delle frecce direzionali e del tasto Back, differenziato tra quando i controlli sono visibili e quando non lo sono. La navigazione spaziale dei tasti direzionali, tuttavia, è gestita da Antares.
+    //Comportamento delle frecce direzionali e del tasto Back, differenziato tra quando i controlli sono visibili e quando non lo sono. La navigazione spaziale dei tasti direzionali, tuttavia, è gestita da Antares. Lo useEffect seguente aggiunge il keyDownHandler quando questo è disponibile.
     const onKeyDownHandler = (e) => {
         if (
             e.keyCode === 37 ||
@@ -129,14 +128,12 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             removeKeydownEvent(onKeyDown);
         };
     }, [onKeyDownHandler]);
-    //////////////////////////////////////////////////////
 
     //Funzione che ferma le azioni di rewind o fast forward in corso da chiamare prima di cominciare nuove azioni, in modo che le precedenti e le successive non vadano in contrasto.
     const clearControls = () => {
         seekrateRef.current = 0;
         clearInterval(seekingRef.current);
         seekingRef.current = null;
-        console.log('SEEKING REF CLEARED BY THE PLAY BUTTON: ', seekingRef.current)
     }
 
     //Funzionalità del tasto Play
@@ -146,7 +143,6 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             resetControlsCountdown();
         } else {
             if (controlRef.current === 'fast-forward' || controlRef.current === 'rewind') {
-                console.log('Setting currentTime to: ', seekToRef.current)
                 setCurrentTime(seekTo);
                 instanceOfPlayer.currentTime = seekTo;
             }
@@ -163,57 +159,9 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
         }
     }
 
-    //Funzionalità del tasto fast-forward
-    const onForward = () => {
-        if (!displayControls) {
-            setDisplayControls(true);
-            resetControlsCountdown()
-        } else {
-            if (controlRef.current !== 'fast-forward') {
-                setIsPlaying((false));
-                instanceOfPlayer.pause();
-                clearControls();
-                seekToRef.current = currentTime;
-                console.log('Current time at the start of fast-forward: ', currentTime);
-                console.log('seektoRef at the start of fast-forward: ', seekToRef.current);
-            }
-
-            controlRef.current = 'fast-forward';
-
-            switch (seekrateRef.current) {
-                default:
-                    return;
-                case 0:
-                    seekrateRef.current = 2;
-                    break;
-                case 2:
-                    seekrateRef.current = 4
-                    break;
-                case 4:
-                    seekrateRef.current = 8;
-                    break;
-            }
-
-            clearInterval(seekingRef.current);
-
-            seekingRef.current = setInterval(() => {
-                resetControlsCountdown();
-                if (seekToRef.current < duration) {
-                    seekToRef.current += 5 * seekrateRef.current;
-                    setSeekTo(seekToRef.current);
-                    console.log('Setting seekTo to: ', seekToRef.current)
-                    console.log('seekingRef.current: ', seekingRef.current);
-                } else {
-                    resumeSpatialNavigation();
-                    focusTo(parentFocusable);
-                    setReadyToPlay(false);
-                    setDisplayPlayer(false);
-                }
-            }, 1000)
-        }
-    }
-
+    //Funzionalità dei tasti fast-forward e rewind
     const onFastForwardOrRewind = (command) => {
+        //Logica comune a entrambi i controlli
         if (!displayControls) {
             setDisplayControls(true);
             resetControlsCountdown()
@@ -223,8 +171,6 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 instanceOfPlayer.pause();
                 clearControls();
                 seekToRef.current = currentTime;
-                console.log('Current time when the command is issued: ', currentTime);
-                console.log('seektoRef at the start of the command: ', seekToRef.current);
             }
 
             controlRef.current = command;
@@ -234,12 +180,15 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                     return;
                 case 0:
                     seekrateRef.current = 2;
+                    setSeekRate(2)
                     break;
                 case 2:
-                    seekrateRef.current = 4
+                    seekrateRef.current = 4;
+                    setSeekRate(4);
                     break;
                 case 4:
                     seekrateRef.current = 8;
+                    setSeekRate(8);
                     break;
             }
 
@@ -247,17 +196,18 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
 
             seekingRef.current = setInterval(() => {
                 resetControlsCountdown();
+                //Fast forward
                 if (command === 'fast-forward') {
                     if (seekToRef.current < duration - (5 * seekrateRef.current)) {
                         seekToRef.current += 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
                         console.log('Forwarding seekTo to: ', seekToRef.current)
                         console.log('seekingRef.current: ', seekingRef.current);
-                    } /* else if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
+                    } else if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
                         console.log('LAST FORWARD')
                         seekToRef.current = duration;
                         setSeekTo(seekToRef.current);
-                    } */
+                    }
                     else if (seekToRef.current === duration) {
                         resumeSpatialNavigation();
                         focusTo(parentFocusable);
@@ -265,6 +215,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         setDisplayPlayer(false);
                     }
                 } else if (command === 'rewind') {
+                    // Rewind
                     if (seekToRef.current > 0) {
                         seekToRef.current -= 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
@@ -279,20 +230,20 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
         }
     }
 
-    //Gestione estetica del focus sui tasti triggerata sull'onFocus dei singoli tasti
-    const highlightRewind = () => {
-        setIsHighlighted({ play: false, forward: false, rewind: true });
+    //Gestione estetica del focus sui tasti triggerata sull'onFocus dei singoli tasti (vedi variabile di stato isHighlighted).
+    const highlight = (icon) => {
+        switch (icon) {
+            default:
+                setIsHighlighted({ play: true, forward: false, rewind: false });
+                break;
+            case 'rewind':
+                setIsHighlighted({ play: false, forward: false, rewind: true });
+                break;
+            case 'fast-forward':
+                setIsHighlighted({ play: false, forward: true, rewind: false });
+                break;
+        }
     };
-
-    const highlightPlay = () => {
-        setIsHighlighted({ play: true, forward: false, rewind: false });
-    };
-
-    const highlightFastForward = () => {
-        setIsHighlighted({ play: false, forward: true, rewind: false });
-    };
-    ///////////////////////////////////////
-
 
     //Render del componente
     return (
@@ -311,14 +262,14 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                     focusedClassname='controls-button-focused'
                     index={0}
                     onEnterDown={() => { onFastForwardOrRewind('rewind') }}
-                    onFocus={highlightRewind}>
+                    onFocus={() => { highlight('rewind') }}>
                     <img alt='rewind-icon'
                         src={isHighlighted.rewind ? HighlightedRewind : Rewind} />
                     <span className='seekrate rewind-seekrate'
                         style={{
                             opacity: `${controlRef.current === 'rewind' ? '1' : '0'}`,
-                            color: `${isHighlighted.rewind ? '#3184c3' : 'black'}`
-                        }}>{`x${seekrateRef.current}`}</span>
+                            color: `${isHighlighted.rewind ? '#3184c3' : 'white'}`
+                        }}>{`x${seekRate}`}</span>
                 </AntaresFocusable>
                 <AntaresFocusable
                     classname='play-button controls-button'
@@ -326,7 +277,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                     focusableId='play-button'
                     index={1}
                     onEnterDown={playOrPause}
-                    onFocus={highlightPlay}>
+                    onFocus={() => { highlight('play') }}>
                     <img alt='play/pause icon'
                         src={isPlaying ? (isHighlighted.play ? HighlightedPause : Pause) : (isHighlighted.play ? HighlightedPlay : Play)} className='controls-icon' />
                 </AntaresFocusable>
@@ -335,12 +286,12 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                     focusedClassname='controls-button-focused'
                     index={2}
                     onEnterDown={() => { onFastForwardOrRewind('fast-forward') }}
-                    onFocus={highlightFastForward}>
+                    onFocus={() => { highlight('fast-forward') }}>
                     <span className='seekrate fast-forward-seekrate'
                         style={{
                             opacity: `${controlRef.current === 'fast-forward' ? '1' : '0'}`,
-                            color: `${isHighlighted.forward ? '#3184c3' : 'black'}`
-                        }}>{`x${seekrateRef.current}`}</span>
+                            color: `${isHighlighted.forward ? '#3184c3' : 'white'}`
+                        }}>{`x${seekRate}`}</span>
                     <img alt='fast-forward-icon'
                         src={isHighlighted.forward ? HighlightedFastForward : FastForward} className='controls-icon' />
                 </AntaresFocusable>

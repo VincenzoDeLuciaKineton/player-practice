@@ -46,11 +46,11 @@
     color: white;
 }
 
-.rewind-skiprate{
+.rewind-seekrate{
     margin-left: 8px;
 }
 
-.fast-forward-skiprate {
+.fast-forward-seekrate {
     margin-right: 8px;
 }
 
