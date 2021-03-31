@@ -217,17 +217,18 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         setReadyToPlay(false);
                         setDisplayPlayer(false);
                     }
-                } else if (command === 'rewind') {
                     // Rewind
-                    if (seekToRef.current > 0) {
+                } else if (command === 'rewind') {
+                    if (5 * seekrateRef.current < seekToRef.current) {
                         seekToRef.current -= 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
-                        console.log('Rewinding seekTo to: ', seekTo)
                     } else {
                         seekToRef.current = 0;
-                        setSeekTo(seekToRef.current);
+                        setSeekTo(0)
                         instanceOfPlayer.currentTime = 0;
+                        instanceOfPlayer.play();
                     }
+                    console.log('Rewinding seekTo to: ', seekTo);
                 }
             }, 1000)
         }
