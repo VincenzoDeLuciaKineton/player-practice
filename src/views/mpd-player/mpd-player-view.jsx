@@ -1,12 +1,15 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
-import { ConfigContext } from '../../context/ConfigContext'
 import './mpd-player-view.css'
+import { navigationUtilities } from 'antares'
+import { ConfigContext } from '../../context/ConfigContext'
+import { PlayerContext } from '../../context/PlayerContext'
 import Controls from '../controls/controls'
 import LoaderView from '../loader/loader-view'
 
-const MpdPlayerView = () => {
+const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
     const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext);
+    const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext)
 
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -61,6 +64,10 @@ const MpdPlayerView = () => {
     const onEnded = () => {
         console.log('Event from the player: ended');
         playerStateRef.current = 'ended';
+        resumeSpatialNavigation();
+        focusTo(parentFocusable);
+        setReadyToPlay(false);
+        setDisplayPlayer(false);
     }
 
     const onLoadedData = () => {
@@ -105,4 +112,4 @@ const MpdPlayerView = () => {
     )
 }
 
-export default MpdPlayerView;
+export default navigationUtilities(MpdPlayerView);

@@ -8,6 +8,9 @@
     width: 1280px;
     height: 10px;
     background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .progress {

@@ -11,14 +11,14 @@ import Pause from "../assets/images/pause-default.png";
 import Play from "../assets/images/play-default.png";
 import Rewind from "../assets/images/bw-default.png";
 import FastForward from "../assets/images/fw-default.png";
-import HighlightedPlay from "../assets/images/play-focus.png";
 import HighlightedPause from "../assets/images/pause-focus.png";
-import HighlightedFastForward from "../assets/images/fw-focus.png";
+import HighlightedPlay from "../assets/images/play-focus.png";
 import HighlightedRewind from "../assets/images/bw-focus.png";
+import HighlightedFastForward from "../assets/images/fw-focus.png";
 ///////////////////////////////
 
 //Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la Ref che registra gli stati del player, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player, utilities di Antares per la navigazione.
-const Controls = ({ instanceOfPlayer, duration, playerState, currentTime, setCurrentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
+const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, focusTo, resumeSpatialNavigation, pauseSpatialNavigation }) => {
 
     //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
     const { setReadyToPlay, controlsCountdownFromConfig } = useContext(ConfigContext)
@@ -51,6 +51,7 @@ const Controls = ({ instanceOfPlayer, duration, playerState, currentTime, setCur
     //Ref a cui viene assegnato il countdown per far scomparire i controlli dopo ogni keypress
     const controlsCountdownRef = useRef(null);
 
+    //Ref e variabile dis tato che indicano fino a che punto mandare avanti la currentTime durante un fast forward o un rewind. La ref aggiorna il valore dinamicamente, mentre settare lo stato triggera il re-render
     const seekToRef = useRef(currentTime);
     const [seekTo, setSeekTo] = useState(currentTime);
 
@@ -212,43 +213,67 @@ const Controls = ({ instanceOfPlayer, duration, playerState, currentTime, setCur
         }
     }
 
-
-    //Funzionalità del tasto rewind
-    const onRewind = () => {
+    const onFastForwardOrRewind = (command) => {
         if (!displayControls) {
-            resetControlsCountdown();
+            setDisplayControls(true);
+            resetControlsCountdown()
         } else {
-            seekingRef.current = true;
-            setIsPlaying(false);
-            instanceOfPlayer.pause();
+            if (controlRef.current !== command) {
+                setIsPlaying((false));
+                instanceOfPlayer.pause();
+                clearControls();
+                seekToRef.current = currentTime;
+                console.log('Current time when the command is issued: ', currentTime);
+                console.log('seektoRef at the start of the command: ', seekToRef.current);
+            }
 
-            controlRef.current = 'rewind';
+            controlRef.current = command;
 
             switch (seekrateRef.current) {
+                default:
+                    return;
                 case 0:
                     seekrateRef.current = 2;
                     break;
                 case 2:
-                    seekrateRef.current = 4;
+                    seekrateRef.current = 4
                     break;
                 case 4:
                     seekrateRef.current = 8;
                     break;
-                default:
-                    return;
             }
 
+            clearInterval(seekingRef.current);
+
             seekingRef.current = setInterval(() => {
-                console.log('SKIPPING BACKWARDS');
-                instanceOfPlayer.currentTime -= 5 * seekrateRef.current;
-                resetControlsCountdown()
-                if (seekToRef.current <= 0) {
-                    //Comportamento al raggiungimento dello 0 durante il rewind.
-                    console.log('LEFT EDGE REACHED');
-                    seekToRef.current = instanceOfPlayer.currentTime;
-                    controlRef.current = 'play';
-                    instanceOfPlayer.play();
-                    focusTo('play-button')
+                resetControlsCountdown();
+                if (command === 'fast-forward') {
+                    if (seekToRef.current < duration - (5 * seekrateRef.current)) {
+                        seekToRef.current += 5 * seekrateRef.current;
+                        setSeekTo(seekToRef.current);
+                        console.log('Forwarding seekTo to: ', seekToRef.current)
+                        console.log('seekingRef.current: ', seekingRef.current);
+                    } /* else if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
+                        console.log('LAST FORWARD')
+                        seekToRef.current = duration;
+                        setSeekTo(seekToRef.current);
+                    } */
+                    else if (seekToRef.current === duration) {
+                        resumeSpatialNavigation();
+                        focusTo(parentFocusable);
+                        setReadyToPlay(false);
+                        setDisplayPlayer(false);
+                    }
+                } else if (command === 'rewind') {
+                    if (seekToRef.current > 0) {
+                        seekToRef.current -= 5 * seekrateRef.current;
+                        setSeekTo(seekToRef.current);
+                        console.log('Rewinding seekTo to: ', seekTo)
+                    } else {
+                        seekToRef.current = 0;
+                        setSeekTo(seekToRef.current);
+                        instanceOfPlayer.currentTime = 0;
+                    }
                 }
             }, 1000)
         }
@@ -272,7 +297,7 @@ const Controls = ({ instanceOfPlayer, duration, playerState, currentTime, setCur
     //Render del componente
     return (
         <div className={`${displayControls ? 'fade-in' : 'fade-out'} controls-and-progress-bar`}>
-            <ProgressBarView duration={duration} currentTime={controlRef.current === 'fast-forward' ? seekTo : currentTime} />
+            <ProgressBarView duration={duration} currentTime={controlRef.current === 'fast-forward' || controlRef.current === 'rewind' ? seekTo : currentTime} />
             <AntaresHorizontalList containerClassname='controls-outer'
                 innerClassname='controls-inner'
                 forceFocus={true}
@@ -285,14 +310,14 @@ const Controls = ({ instanceOfPlayer, duration, playerState, currentTime, setCur
                     focusableId='rewind-button'
                     focusedClassname='controls-button-focused'
                     index={0}
-                    onEnterDown={onRewind}
+                    onEnterDown={() => { onFastForwardOrRewind('rewind') }}
                     onFocus={highlightRewind}>
                     <img alt='rewind-icon'
                         src={isHighlighted.rewind ? HighlightedRewind : Rewind} />
                     <span className='seekrate rewind-seekrate'
                         style={{
                             opacity: `${controlRef.current === 'rewind' ? '1' : '0'}`,
-                            color: `${isHighlighted.rewind ? 'black' : 'black'}`
+                            color: `${isHighlighted.rewind ? '#3184c3' : 'black'}`
                         }}>{`x${seekrateRef.current}`}</span>
                 </AntaresFocusable>
                 <AntaresFocusable
@@ -309,12 +334,12 @@ const Controls = ({ instanceOfPlayer, duration, playerState, currentTime, setCur
                     focusableId='fast-forward-button'
                     focusedClassname='controls-button-focused'
                     index={2}
-                    onEnterDown={onForward}
+                    onEnterDown={() => { onFastForwardOrRewind('fast-forward') }}
                     onFocus={highlightFastForward}>
                     <span className='seekrate fast-forward-seekrate'
                         style={{
                             opacity: `${controlRef.current === 'fast-forward' ? '1' : '0'}`,
-                            color: `${isHighlighted.forward ? 'black' : 'black'}`
+                            color: `${isHighlighted.forward ? '#3184c3' : 'black'}`
                         }}>{`x${seekrateRef.current}`}</span>
                     <img alt='fast-forward-icon'
                         src={isHighlighted.forward ? HighlightedFastForward : FastForward} className='controls-icon' />
