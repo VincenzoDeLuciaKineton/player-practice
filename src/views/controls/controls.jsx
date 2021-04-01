@@ -15,6 +15,7 @@ import HighlightedPause from "../assets/images/pause-focus.png";
 import HighlightedPlay from "../assets/images/play-focus.png";
 import HighlightedRewind from "../assets/images/bw-focus.png";
 import HighlightedFastForward from "../assets/images/fw-focus.png";
+import { ErrorContext } from '../../context/ErrorContext'
 ///////////////////////////////
 
 //Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player (currentTime), la funzione per aggiornare il suddetto tempo e infine utilities di Antares per la navigazione.
@@ -23,6 +24,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
     const { setReadyToPlay, controlsCountdownFromConfig } = useContext(ConfigContext)
     const { setDisplayPlayer, parentFocusable } = useContext(PlayerContext);
+    const { showErrorModal } = useContext(ErrorContext);
 
     //Stati: valori pertinenti al singolo componente/pagina il cui cambiamento causa un re-render
     //Variabile di stato che decreta se i controlli siano visibili o meno. Al suo cambiamento è subordinata la visibility dell'intero componente, tramite le animazioni fade-in e fade-out.
@@ -109,10 +111,10 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
 
         }
         if (e.keyCode === 8 || e.keyCode === 461) {
+            console.log('BACK FROM PLAYER');
             if (displayControls) {
                 setDisplayControls(false);
             } else {
-                /* console.log('parentFocusable: ', parentFocusable); */
                 resumeSpatialNavigation();
                 focusTo(parentFocusable);
                 setReadyToPlay(false);

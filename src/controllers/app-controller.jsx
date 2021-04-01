@@ -21,15 +21,15 @@ const AppController = () => {
 
     return (
 
-        <ConfigProvider>
-            <PlayerProvider>
-                <ErrorProvider>
+        <ErrorProvider>
+            <ConfigProvider>
+                <PlayerProvider>
                     <div className='app-controller'>
                         <AppView />
                     </div>
-                </ErrorProvider>
-            </PlayerProvider>
-        </ConfigProvider>
+                </PlayerProvider>
+            </ConfigProvider>
+        </ErrorProvider>
 
     )
 }

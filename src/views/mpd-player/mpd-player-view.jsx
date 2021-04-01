@@ -6,11 +6,13 @@ import { PlayerContext } from '../../context/PlayerContext'
 import Controls from '../controls/controls'
 import LoaderView from '../loader/loader-view'
 import SpinnerView from '../spinner/spinner-view'
+import { ErrorContext } from '../../context/ErrorContext'
 
 const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
     const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext);
-    const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext)
+    const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext);
+    const { setShowErrorModal, setErrorMessage } = useContext(ErrorContext);
 
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -20,9 +22,17 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
     const playerRef = useRef(null);
     const playerStateRef = useRef(null);
+    const bufferingRef = useRef(null);
 
     useEffect(() => {
         console.log('Initializing player')
+
+        bufferingRef.current = setTimeout(() => {
+            console.log('The player did not even start')
+            setErrorMessage('Lost connection');
+            focusTo('error-button-id');
+            setShowErrorModal(true);
+        }, 20000)
 
         if (altair.isHbbTV()) {
             if (window.navigator.userAgent.toUpperCase().indexOf("SAMSUNG") >= 0) {
@@ -46,6 +56,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
             playerRef.current.addEventListener('durationchange', onDurationChange);
             playerRef.current.addEventListener('ended', onEnded);
             playerRef.current.addEventListener('loadeddata', onLoadedData);
+            playerRef.current.addEventListener('loadstart', onLoadStart);
             playerRef.current.addEventListener('pause', onPause);
             playerRef.current.addEventListener('play', onPlay);
             playerRef.current.addEventListener('playing', onPlaying);
@@ -56,12 +67,15 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         return () => {
             if (playerRef.current) {
                 console.log('UNMOUNTING PLAYER EFFECTS');
-                playerRef.current.removeEventListener('timeupdate', onTimeUpdate);
                 playerRef.current.removeEventListener('durationchange', onDurationChange);
+                playerRef.current.removeEventListener('ended', onEnded);
+                playerRef.current.removeEventListener('loadeddata', onLoadedData);
+                playerRef.current.removeEventListener('loadstart', onLoadStart);
                 playerRef.current.removeEventListener('pause', onPause);
                 playerRef.current.removeEventListener('play', onPlay);
                 playerRef.current.removeEventListener('playing', onPlaying);
-                playerRef.current.addEventListener('waiting', onWaiting);
+                playerRef.current.removeEventListener('timeupdate', onTimeUpdate);
+                playerRef.current.removeEventListener('waiting', onWaiting);
             }
             setReadyToPlay(false);
             playerStateRef.current = null;
@@ -108,9 +122,9 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         setShowLoader(false);
     }
 
-    const onPlay = () => {
-        console.log('Event from the player: play')
-        playerStateRef.current = 'play';
+    const onLoadStart = () => {
+        console.log('Event from the player: loadstart')
+        playerStateRef.current = 'loadstart';
     }
 
     const onPause = () => {
@@ -118,9 +132,17 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         playerStateRef.current = 'pause';
     }
 
+    const onPlay = () => {
+        console.log('Event from the player: play')
+        playerStateRef.current = 'play';
+    }
+
     const onPlaying = () => {
         console.log('Event from the player: playing at', playerRef.current.currentTime)
         playerStateRef.current = 'playing';
+        clearTimeout(bufferingRef.current);
+        bufferingRef.current = null;
+        console.log('Resetting the buffering countdown')
         setBuffering(false);
     }
 
@@ -134,11 +156,20 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         console.log('Event from the player: waiting');
         playerStateRef.current = 'waiting';
         setBuffering(true);
+        console.log('Starting the buffering countdown');
+        clearTimeout(bufferingRef.current);
+        bufferingRef.current = null;
+        bufferingRef.current = setTimeout(() => {
+            resumeSpatialNavigation();
+            console.log('The player started and then lost connection')
+            setErrorMessage('Lost connection');
+            focusTo('error-button-id');
+            setShowErrorModal(true);
+        }, 20000)
     }
 
     return (
         <div className='video-and-controls'>
-
             {showLoader ? <LoaderView /> : null}
             <video id="videoPlayer" ref={playerRef} autoPlay={true}></video>
             {duration > 0 && !showLoader ?

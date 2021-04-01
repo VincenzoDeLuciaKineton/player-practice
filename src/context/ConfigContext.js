@@ -1,8 +1,11 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect, useContext } from 'react'
+import { ErrorContext } from './ErrorContext';
 
 export const ConfigContext = createContext();
 
 export const ConfigProvider = ({ children }) => {
+
+    const { setShowErrorModal, setErrorMessage, setErrorParentFocusable } = useContext(ErrorContext)
 
     const [url, setUrl] = useState(null);
     const [controlsCountdownFromConfig, setControlsCountdownFromConfig] = useState(5000);
@@ -13,6 +16,10 @@ export const ConfigProvider = ({ children }) => {
         ).then(res => {
             if (res.url) {
                 setUrl(res.url);
+            } else {
+                setErrorParentFocusable('home-button-id')
+                setErrorMessage('Failed to retrieve the requested data')
+                setShowErrorModal(true);
             }
             if (res.controlsCountdown) {
                 setControlsCountdownFromConfig(res.controlsCountdown);

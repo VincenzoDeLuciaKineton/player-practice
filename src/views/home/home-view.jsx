@@ -15,11 +15,11 @@ const HomeView = ({ focusTo }) => {
     }, [])
 
     const onEnterDown = () => {
+        setErrorParentFocusable('home-button-id');
         if (!url || url === '') {
             console.log('NO URL FOUND')
             focusTo('error-button-id');
-            setErrorParentFocusable('home-button-id');
-            setErrorMessage('Questo pulsante non conduce ad alcun contenuto')
+            setErrorMessage('Unable to retrieve selected content')
             setShowErrorModal(true);
         } else {
             setParentFocusable('home');
@@ -30,8 +30,16 @@ const HomeView = ({ focusTo }) => {
 
 
     return (
-        <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home' retainLastFocus={true} innerWidth={500}>
-            <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown} index={0}>
+        <AntaresHorizontalList containerClassname='home-outer'
+            innerClassname='home-inner'
+            focusableId='home'
+            retainLastFocus={true}
+            innerWidth={500}>
+            <AntaresFocusable classname='home-button'
+                focusedClassname='home-button-focused'
+                focusableId='home-button-id'
+                onEnterDown={onEnterDown}
+                index={0}>
                 <span>Go to the player</span>
             </AntaresFocusable>
         </AntaresHorizontalList>

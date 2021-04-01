@@ -42,8 +42,18 @@
     font-size: 40px;
 }
 
-.error-button {
-    
+.error-button-focused {
+    width: 500px;
+    height: 125px;
+    color: white;
+    border: 2px solid white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    background-color: red;
 }
 
 .error-message {
