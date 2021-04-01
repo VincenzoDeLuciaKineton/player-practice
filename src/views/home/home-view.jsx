@@ -3,25 +3,35 @@ import './home-view.css'
 import { AntaresHorizontalList, AntaresFocusable, navigationUtilities } from 'antares'
 import { PlayerContext } from '../../context/PlayerContext'
 import { ConfigContext } from '../../context/ConfigContext'
+import { ErrorContext } from '../../context/ErrorContext'
 const HomeView = ({ focusTo }) => {
 
-    const { setDisplayPlayer, setParentFocusable } = useContext(PlayerContext)
-    const { setReadyToPlay } = useContext(ConfigContext)
+    const { setDisplayPlayer, setParentFocusable } = useContext(PlayerContext);
+    const { url, setReadyToPlay } = useContext(ConfigContext);
+    const { setShowErrorModal, setErrorParentFocusable, setErrorMessage } = useContext(ErrorContext);
 
     useEffect(() => {
         focusTo('home-button-id');
     }, [])
 
     const onEnterDown = () => {
-        setParentFocusable('home');
-        setReadyToPlay(true);
-        setDisplayPlayer(true);
+        if (!url || url === '') {
+            console.log('NO URL FOUND')
+            focusTo('error-button-id');
+            setErrorParentFocusable('home-button-id');
+            setErrorMessage('Questo pulsante non conduce ad alcun contenuto')
+            setShowErrorModal(true);
+        } else {
+            setParentFocusable('home');
+            setReadyToPlay(true);
+            setDisplayPlayer(true);
+        }
     }
 
 
     return (
         <AntaresHorizontalList containerClassname='home-outer' innerClassname='home-inner' focusableId='home' retainLastFocus={true} innerWidth={500}>
-            <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown}>
+            <AntaresFocusable classname='home-button' focusedClassname='home-button-focused' focusableId='home-button-id' onEnterDown={onEnterDown} index={0}>
                 <span>Go to the player</span>
             </AntaresFocusable>
         </AntaresHorizontalList>

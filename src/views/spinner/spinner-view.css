@@ -8,6 +8,7 @@
     position: absolute !important;
     top: 0 !important;
     left: 0!important;
+    z-index: 3;
 }
 
 .spinner {
@@ -22,8 +23,6 @@
     border-bottom: 8px solid #CCCCCC;
     border-left: 8px solid #FFF;
     animation: 1.2s linear 0s infinite normal none running spin;
-    position: relative;
-    z-index: 3;
 }
 @keyframes spin {
     0% {

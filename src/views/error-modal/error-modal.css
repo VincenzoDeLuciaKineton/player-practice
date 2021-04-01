@@ -1,0 +1,52 @@
+.error-controller {
+    width: 1920px;
+    height: 1080px;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+.error-modal-and-message {
+    width: 1920px;
+    height: 1080px;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    z-index: 5;
+}
+
+.error-modal-outer{
+    width: 500px;
+    height: 165px;
+}
+
+.error-modal-inner{
+    height: 165px;
+}
+
+.error-button {
+    width: 500px;
+    height: 125px;
+    color: white;
+    border: 2px solid white;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+}
+
+.error-button {
+    
+}
+
+.error-message {
+    color: white;
+    font-size: 40px;
+}

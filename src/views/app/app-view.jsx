@@ -1,8 +1,9 @@
 import React from 'react'
 import './app-view.css'
 import { navigationUtilities } from 'antares'
-import PlayerController from '../../controllers/player-controller'
+import ErrorController from '../../controllers/error-controller'
 import HomeView from '../home/home-view'
+import PlayerController from '../../controllers/player-controller'
 
 const AppView = () => {
 
@@ -10,6 +11,7 @@ const AppView = () => {
         <div className='app'>
             <HomeView />
             <PlayerController />
+            <ErrorController />
         </div>
     )
 }

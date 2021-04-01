@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
 import './mpd-player-view.css'
-import { navigationUtilities } from 'antares'
+import { altair, navigationUtilities } from 'antares'
 import { ConfigContext } from '../../context/ConfigContext'
 import { PlayerContext } from '../../context/PlayerContext'
 import Controls from '../controls/controls'
@@ -23,6 +23,22 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
     useEffect(() => {
         console.log('Initializing player')
+
+        if (altair.isHbbTV()) {
+            if (window.navigator.userAgent.toUpperCase().indexOf("SAMSUNG") >= 0) {
+                if (
+                    window.navigator.userAgent.toUpperCase().indexOf("2020") >= 0 ||
+                    window.navigator.userAgent.toUpperCase().indexOf("2021") >= 0
+                ) {
+                    altair.stopBroadcastVideo();
+                } else {
+                    document.getElementById("mainVideoObject").setChannel(null);
+                }
+            } else {
+                altair.stopBroadcastVideo();
+            }
+        }
+
         const dashjs = window.dashjs
         const initializedPlayer = dashjs.MediaPlayer().create();
         if (url && readyToPlay) {
@@ -70,6 +86,20 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         focusTo(parentFocusable);
         setReadyToPlay(false);
         setDisplayPlayer(false);
+        if (altair.isHbbTV()) {
+            if (window.navigator.userAgent.toUpperCase().indexOf("SAMSUNG") >= 0) {
+                if (
+                    window.navigator.userAgent.toUpperCase().indexOf("2020") >= 0 ||
+                    window.navigator.userAgent.toUpperCase().indexOf("2021") >= 0
+                ) {
+                    altair.startBroadcastVideo();
+                } else {
+                    document.getElementById("mainVideoObject").setChannel(window.channel);
+                }
+            } else {
+                altair.startBroadcastVideo();
+            }
+        }
     }
 
     const onLoadedData = () => {

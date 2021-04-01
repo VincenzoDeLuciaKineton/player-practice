@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useContext } from 'react'
 import './controls.css'
-import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent } from 'antares'
+import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent, altair } from 'antares'
 import { PlayerContext } from '../../context/PlayerContext'
 import { ConfigContext } from '../../context/ConfigContext'
 import ProgressBarView from '../progress-bar/progress-bar-view'
@@ -117,6 +117,20 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 focusTo(parentFocusable);
                 setReadyToPlay(false);
                 setDisplayPlayer(false);
+                if (altair.isHbbTV()) {
+                    if (window.navigator.userAgent.toUpperCase().indexOf("SAMSUNG") >= 0) {
+                        if (
+                            window.navigator.userAgent.toUpperCase().indexOf("2020") >= 0 ||
+                            window.navigator.userAgent.toUpperCase().indexOf("2021") >= 0
+                        ) {
+                            altair.startBroadcastVideo();
+                        } else {
+                            document.getElementById("mainVideoObject").setChannel(window.channel);
+                        }
+                    } else {
+                        altair.startBroadcastVideo();
+                    }
+                }
             }
         }
 
@@ -216,6 +230,20 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         focusTo(parentFocusable);
                         setReadyToPlay(false);
                         setDisplayPlayer(false);
+                        if (altair.isHbbTV()) {
+                            if (window.navigator.userAgent.toUpperCase().indexOf("SAMSUNG") >= 0) {
+                                if (
+                                    window.navigator.userAgent.toUpperCase().indexOf("2020") >= 0 ||
+                                    window.navigator.userAgent.toUpperCase().indexOf("2021") >= 0
+                                ) {
+                                    altair.startBroadcastVideo();
+                                } else {
+                                    document.getElementById("mainVideoObject").setChannel(window.channel);
+                                }
+                            } else {
+                                altair.startBroadcastVideo();
+                            }
+                        }
                     }
                     // Rewind
                 } else if (command === 'rewind') {
