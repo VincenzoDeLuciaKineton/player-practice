@@ -161,12 +161,12 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             resetControlsCountdown();
         } else {
             if (controlRef.current === 'fast-forward' || controlRef.current === 'rewind') {
-                setCurrentTime(seekTo);
                 instanceOfPlayer.currentTime = seekTo;
+                setCurrentTime(seekTo);
             }
             controlRef.current = 'play';
             clearControls();
-            setIsPlaying(!isPlaying)
+            setIsPlaying(!isPlaying);
             resetControlsCountdown();
             if (instanceOfPlayer.paused) {
                 instanceOfPlayer.play()
@@ -220,8 +220,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
                             seekToRef.current += 5 * seekrateRef.current;
                             setSeekTo(seekToRef.current);
-                            console.log('Forwarding seekTo to: ', seekToRef.current)
-                            console.log('seekingRef.current: ', seekingRef.current);
+                            console.log('Forwarding seekTo to: ', seekToRef.current);
                         } else {
                             console.log('LAST FORWARD, ', seekToRef.current, duration);
                             seekToRef.current = duration;
@@ -252,13 +251,14 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                     if (5 * seekrateRef.current < seekToRef.current) {
                         seekToRef.current -= 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
+                        console.log('Rewinding seekTo to: ', seekToRef.current);
                     } else {
+                        console.log('LEFT EDGE REACHED')
                         seekToRef.current = 0;
                         setSeekTo(0)
                         instanceOfPlayer.currentTime = 0;
                         instanceOfPlayer.play();
                     }
-                    console.log('Rewinding seekTo to: ', seekTo);
                 }
             }, 1000)
         }
