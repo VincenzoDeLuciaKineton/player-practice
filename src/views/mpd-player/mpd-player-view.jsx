@@ -53,28 +53,52 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         const initializedPlayer = dashjs.MediaPlayer().create();
         if (url && readyToPlay) {
             initializedPlayer.initialize(playerRef.current, url, true);
+            playerRef.current.addEventListener('abort', () => { onPlayerEvent('abort') });
+            playerRef.current.addEventListener('canplay', () => { onPlayerEvent('canplay') });
+            playerRef.current.addEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
             playerRef.current.addEventListener('durationchange', onDurationChange);
+            playerRef.current.addEventListener('emptied', () => { onPlayerEvent('emptied') });
             playerRef.current.addEventListener('ended', onEnded);
+            playerRef.current.addEventListener('error', onError)
             playerRef.current.addEventListener('loadeddata', onLoadedData);
             playerRef.current.addEventListener('loadstart', onLoadStart);
             playerRef.current.addEventListener('pause', onPause);
             playerRef.current.addEventListener('play', onPlay);
             playerRef.current.addEventListener('playing', onPlaying);
+            /* playerRef.current.addEventListener('progress', () => { onPlayerEvent('progress') }); */
+            playerRef.current.addEventListener('ratechange', () => { onPlayerEvent('ratechange') });
+            playerRef.current.addEventListener('seeked', () => { onPlayerEvent('seeked') });
+            playerRef.current.addEventListener('seeking', () => { onPlayerEvent('seeking') });
+            playerRef.current.addEventListener('stalled', () => { onPlayerEvent('stalled') });
+            playerRef.current.addEventListener('suspend', () => { onPlayerEvent('suspend') });
             playerRef.current.addEventListener('timeupdate', onTimeUpdate);
+            playerRef.current.addEventListener('volumechange', () => { onPlayerEvent('volumechange') });
             playerRef.current.addEventListener('waiting', onWaiting);
         }
 
         return () => {
             if (playerRef.current) {
                 console.log('UNMOUNTING PLAYER EFFECTS');
+                playerRef.current.removeEventListener('abort', () => { onPlayerEvent('abort') });
+                playerRef.current.removeEventListener('canplay', () => { onPlayerEvent('canplay') });
+                playerRef.current.removeEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
                 playerRef.current.removeEventListener('durationchange', onDurationChange);
+                playerRef.current.removeEventListener('emptied', () => { onPlayerEvent('emptied') });
                 playerRef.current.removeEventListener('ended', onEnded);
+                playerRef.current.removeEventListener('error', onError)
                 playerRef.current.removeEventListener('loadeddata', onLoadedData);
                 playerRef.current.removeEventListener('loadstart', onLoadStart);
                 playerRef.current.removeEventListener('pause', onPause);
                 playerRef.current.removeEventListener('play', onPlay);
                 playerRef.current.removeEventListener('playing', onPlaying);
+/*                 playerRef.current.removeEventListener('progress', () => { onPlayerEvent('progress') });
+ */                playerRef.current.removeEventListener('ratechange', () => { onPlayerEvent('ratechange') });
+                playerRef.current.removeEventListener('seeked', () => { onPlayerEvent('seeked') });
+                playerRef.current.removeEventListener('seeking', () => { onPlayerEvent('seeking') });
+                playerRef.current.removeEventListener('stalled', () => { onPlayerEvent('stalled') });
+                playerRef.current.removeEventListener('suspend', () => { onPlayerEvent('suspend') });
                 playerRef.current.removeEventListener('timeupdate', onTimeUpdate);
+                playerRef.current.removeEventListener('volumechange', () => { onPlayerEvent('volumechange') });
                 playerRef.current.removeEventListener('waiting', onWaiting);
             }
             setReadyToPlay(false);
@@ -84,6 +108,11 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
             console.log('Player unmounted');
         }
     }, [])
+
+    const onPlayerEvent = (event) => {
+        console.log(`Event from the player: ${event}`);
+        playerStateRef.current = event;
+    }
 
     const onDurationChange = () => {
         console.log('duration: ', playerRef.current.duration);
@@ -114,6 +143,11 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 altair.startBroadcastVideo();
             }
         }
+    }
+
+    const onError = () => {
+        console.log('Event from the player: ended');
+        playerStateRef.current = 'error';
     }
 
     const onLoadedData = () => {
@@ -171,7 +205,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     return (
         <div className='video-and-controls'>
             {showLoader ? <LoaderView /> : null}
-            <video id="videoPlayer" ref={playerRef} autoPlay={true}></video>
+            <video id="videoPlayer" ref={playerRef}></video>
             {duration > 0 && !showLoader ?
                 (buffering ?
                     <SpinnerView /> :

@@ -49,6 +49,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
 
     //Ref che indica quale sia l'ultimo comando inviato dai controlli al player
     const controlRef = useRef('play');
+    const [control, setControl] = useState('play')
 
     //Ref a cui viene assegnato il countdown per far scomparire i controlli dopo ogni keypress
     const controlsCountdownRef = useRef(null);
@@ -161,18 +162,21 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             resetControlsCountdown();
         } else {
             if (controlRef.current === 'fast-forward' || controlRef.current === 'rewind') {
-                instanceOfPlayer.currentTime = seekTo;
-                setCurrentTime(seekTo);
+                setCurrentTime(seekToRef.current);
+                instanceOfPlayer.currentTime = seekToRef.current;
             }
             controlRef.current = 'play';
+            setControl('play');
             clearControls();
-            setIsPlaying(!isPlaying);
             resetControlsCountdown();
             if (instanceOfPlayer.paused) {
-                instanceOfPlayer.play()
+                setIsPlaying(true);
+                instanceOfPlayer.play();
             } else {
-                controlRef.current = 'pause'
-                instanceOfPlayer.pause()
+                controlRef.current = 'pause';
+                setControl('pause');
+                setIsPlaying(false);
+                instanceOfPlayer.pause();
             }
         }
     }
@@ -192,6 +196,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             }
 
             controlRef.current = command;
+            setControl(command);
 
             switch (seekrateRef.current) {
                 default:
@@ -215,7 +220,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             seekingRef.current = setInterval(() => {
                 resetControlsCountdown();
                 //Fast forward
-                if (command === 'fast-forward') {
+                if (controlRef.current === 'fast-forward') {
                     if (seekToRef.current < duration - (5 * seekrateRef.current)) {
                         if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
                             seekToRef.current += 5 * seekrateRef.current;
@@ -247,17 +252,18 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         }
                     }
                     // Rewind
-                } else if (command === 'rewind') {
-                    if (5 * seekrateRef.current < seekToRef.current) {
+                } else if (controlRef.current === 'rewind') {
+                    if (seekToRef.current > 5 * seekrateRef.current) {
                         seekToRef.current -= 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
                         console.log('Rewinding seekTo to: ', seekToRef.current);
-                    } else {
-                        console.log('LEFT EDGE REACHED')
-                        seekToRef.current = 0;
-                        setSeekTo(0)
-                        instanceOfPlayer.currentTime = 0;
-                        instanceOfPlayer.play();
+                        if (seekToRef.current < 5 * seekrateRef.current) {
+                            console.log('LEFT EDGE REACHED')
+                            seekToRef.current = 0;
+                            setSeekTo(0);
+                            focusTo('play-button');
+                            playOrPause();
+                        }
                     }
                 }
             }, 1000)
@@ -282,7 +288,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     //Render del componente
     return (
         <div className={`${displayControls ? 'fade-in' : 'fade-out'} controls-and-progress-bar`}>
-            <ProgressBarView duration={duration} currentTime={controlRef.current === 'fast-forward' || controlRef.current === 'rewind' ? seekTo : currentTime} />
+            <ProgressBarView duration={duration} currentTime={control === 'fast-forward' || control === 'rewind' ? seekTo : currentTime} />
             <AntaresHorizontalList containerClassname='controls-outer'
                 innerClassname='controls-inner'
                 forceFocus={true}
