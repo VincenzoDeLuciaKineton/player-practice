@@ -15,7 +15,6 @@ import HighlightedPause from "../assets/images/pause-focus.png";
 import HighlightedPlay from "../assets/images/play-focus.png";
 import HighlightedRewind from "../assets/images/bw-focus.png";
 import HighlightedFastForward from "../assets/images/fw-focus.png";
-import { ErrorContext } from '../../context/ErrorContext'
 ///////////////////////////////
 
 //Props passate al player, rispettivamente: il player su cui andranno ad agire i controlli, la durata del video in riproduzione, il tempo in cui si trova la riproduzione del player (currentTime), la funzione per aggiornare il suddetto tempo e infine utilities di Antares per la navigazione.
@@ -65,6 +64,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     useEffect(() => {
         focusTo('play-button');
         resetControlsCountdown();
+        console.log('seekToRef.current: ', seekToRef.current);
 
         return () => {
             clearTimeout(controlsCountdownRef.current);
@@ -194,7 +194,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 setIsPlaying((false));
                 instanceOfPlayer.pause();
                 clearControls();
-                seekToRef.current = currentTime;
+                instanceOfPlayer.currentTime = seekToRef.current;
             }
 
             controlRef.current = command;
@@ -259,13 +259,12 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         seekToRef.current -= 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
                         console.log('Rewinding seekTo to: ', seekToRef.current);
-                        if (seekToRef.current < 5 * seekrateRef.current) {
-                            console.log('LEFT EDGE REACHED')
-                            seekToRef.current = 0;
-                            setSeekTo(0);
-                            focusTo('play-button');
-                            playOrPause();
-                        }
+                    } else if (seekToRef.current < 5 * seekrateRef.current) {
+                        console.log('LEFT EDGE REACHED')
+                        seekToRef.current = 0;
+                        setSeekTo(0);
+                        focusTo('play-button');
+                        playOrPause();
                     }
                 }
             }, 1000)
