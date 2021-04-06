@@ -37,6 +37,12 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
         forward: false,
         rewind: false,
     });
+    //Ref a cui viene assegnato il countdown per far scomparire i controlli dopo ogni keypress
+    const controlsCountdownRef = useRef(null);
+
+    //Ref che indica quale sia l'ultimo comando inviato dai controlli al player
+    const controlRef = useRef('play');
+    const [control, setControl] = useState('play')
 
     //Ref che indica se il player sia in seeking o meno; quando è in seeking sarà una setInterval, quando non lo è sarà null.
     const seekingRef = useRef(null);
@@ -44,13 +50,6 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     //Ref e variabile di stato che decretano di quanto debba andare avanti o indietro la currentTime ad ogni intervallo della funzione di fast forward o rewind. La ref mantiene il valore aggiornato, mentre aggiornare lo stato triggera il re-render.
     const seekrateRef = useRef(2);
     const [seekRate, setSeekRate] = useState(2);
-
-    //Ref che indica quale sia l'ultimo comando inviato dai controlli al player
-    const controlRef = useRef('play');
-    const [control, setControl] = useState('play')
-
-    //Ref a cui viene assegnato il countdown per far scomparire i controlli dopo ogni keypress
-    const controlsCountdownRef = useRef(null);
 
     //Ref e variabile dis tato che indicano fino a che punto mandare avanti la currentTime durante un fast forward o un rewind. La ref aggiorna il valore dinamicamente, mentre settare lo stato triggera il re-render
     const seekToRef = useRef(currentTime);
@@ -190,10 +189,18 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             setDisplayControls(true);
             resetControlsCountdown()
         } else {
-            if (controlRef.current !== command) {
-                setIsPlaying((false));
-                instanceOfPlayer.pause();
+            setIsPlaying((false));
+            instanceOfPlayer.pause();
+            if (controlRef.current === 'play') {
+                console.log('FROM PLAYING TO SKIPPING');
+                seekToRef.current = currentTime;
+                setSeekTo(currentTime);
                 clearControls();
+
+            } else if (controlRef.current !== command && controlRef.current !== 'play') {
+                console.log('FROM SKIPPING TO OPPOSITE SKIPPING')
+                clearControls();
+                setCurrentTime(seekToRef.current);
                 instanceOfPlayer.currentTime = seekToRef.current;
             }
 
@@ -259,7 +266,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         seekToRef.current -= 5 * seekrateRef.current;
                         setSeekTo(seekToRef.current);
                         console.log('Rewinding seekTo to: ', seekToRef.current);
-                    } else if (seekToRef.current < 5 * seekrateRef.current) {
+                    } else if (seekToRef.current <= 5 * seekrateRef.current) {
                         console.log('LEFT EDGE REACHED')
                         seekToRef.current = 0;
                         setSeekTo(0);
