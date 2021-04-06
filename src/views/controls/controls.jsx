@@ -24,7 +24,6 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
     //Contesti utilizzati: valori e funzioni comuni a più componenti/pagine 
     const { setReadyToPlay, controlsCountdownFromConfig } = useContext(ConfigContext)
     const { setDisplayPlayer, parentFocusable } = useContext(PlayerContext);
-    const { showErrorModal } = useContext(ErrorContext);
 
     //Stati: valori pertinenti al singolo componente/pagina il cui cambiamento causa un re-render
     //Variabile di stato che decreta se i controlli siano visibili o meno. Al suo cambiamento è subordinata la visibility dell'intero componente, tramite le animazioni fade-in e fade-out.
@@ -114,7 +113,10 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
         if (e.keyCode === 8 || e.keyCode === 461) {
             console.log('BACK FROM PLAYER');
             if (displayControls) {
-                setDisplayControls(false);
+                if (controlRef.current !== 'fast-forward' && controlRef.current !== 'rewind') {
+                    console.log('HIDING CONTROLS')
+                    setDisplayControls(false);
+                }
             } else {
                 resumeSpatialNavigation();
                 focusTo(parentFocusable);

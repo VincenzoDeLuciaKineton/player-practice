@@ -69,7 +69,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
             playerRef.current.addEventListener('ratechange', () => { onPlayerEvent('ratechange') });
             playerRef.current.addEventListener('seeked', () => { onPlayerEvent('seeked') });
             playerRef.current.addEventListener('seeking', () => { onPlayerEvent('seeking') });
-            playerRef.current.addEventListener('stalled', () => { onPlayerEvent('stalled') });
+            playerRef.current.addEventListener('stalled', onStalled);
             playerRef.current.addEventListener('suspend', () => { onPlayerEvent('suspend') });
             playerRef.current.addEventListener('timeupdate', onTimeUpdate);
             playerRef.current.addEventListener('volumechange', () => { onPlayerEvent('volumechange') });
@@ -91,11 +91,11 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 playerRef.current.removeEventListener('pause', onPause);
                 playerRef.current.removeEventListener('play', onPlay);
                 playerRef.current.removeEventListener('playing', onPlaying);
-/*                 playerRef.current.removeEventListener('progress', () => { onPlayerEvent('progress') });
- */                playerRef.current.removeEventListener('ratechange', () => { onPlayerEvent('ratechange') });
+                /*playerRef.current.removeEventListener('progress', () => { onPlayerEvent('progress') });*/
+                playerRef.current.removeEventListener('ratechange', () => { onPlayerEvent('ratechange') });
                 playerRef.current.removeEventListener('seeked', () => { onPlayerEvent('seeked') });
                 playerRef.current.removeEventListener('seeking', () => { onPlayerEvent('seeking') });
-                playerRef.current.removeEventListener('stalled', () => { onPlayerEvent('stalled') });
+                playerRef.current.removeEventListener('stalled', onStalled);
                 playerRef.current.removeEventListener('suspend', () => { onPlayerEvent('suspend') });
                 playerRef.current.removeEventListener('timeupdate', onTimeUpdate);
                 playerRef.current.removeEventListener('volumechange', () => { onPlayerEvent('volumechange') });
@@ -157,7 +157,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     }
 
     const onLoadStart = () => {
-        console.log('Event from the player: loadstart')
+        console.log('Event from the player: loadstart');
         playerStateRef.current = 'loadstart';
     }
 
@@ -167,7 +167,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     }
 
     const onPlay = () => {
-        console.log('Event from the player: play')
+        console.log('Event from the player: play');
         playerStateRef.current = 'play';
     }
 
@@ -178,6 +178,12 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         bufferingRef.current = null;
         console.log('Resetting the buffering countdown')
         setBuffering(false);
+    }
+
+    const onStalled = () => {
+        console.log('Event from the player: stalled');
+        playerStateRef.current = 'stalled';
+
     }
 
     const onTimeUpdate = () => {
@@ -211,7 +217,6 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                     <SpinnerView /> :
                     <Controls
                         instanceOfPlayer={playerRef.current}
-                        playerState={playerStateRef.current}
                         currentTime={currentTime}
                         setCurrentTime={setCurrentTime}
                         duration={duration} />) :
