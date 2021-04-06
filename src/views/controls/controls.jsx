@@ -72,15 +72,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             seekingRef.current = null;
         }
 
-    }, [])
-
-    ///////////////////////////////////////////////////
-    //useEffect per monitorare gli stati del player
-    /* useEffect(() => {
-        console.log('playerState: ', playerState, currentTime);
-        console.log('Is the player paused?', instanceOfPlayer.paused);
-    }, [playerState, instanceOfPlayer.paused]) */
-    ///////////////////////////////////////////////
+    }, []);
 
     //Funzione che resetta il countdown per nascondere i controlli dopo ogni keypress
     const resetControlsCountdown = () => {
@@ -192,21 +184,20 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             setIsPlaying((false));
             instanceOfPlayer.pause();
             if (controlRef.current === 'play') {
-                console.log('FROM PLAYING TO SKIPPING');
+                // Caso in cui si preme play mentre si è in fast-forward o in rewind
+                clearControls();
                 seekToRef.current = currentTime;
                 setSeekTo(currentTime);
-                clearControls();
 
             } else if (controlRef.current !== command && controlRef.current !== 'play') {
-                console.log('FROM SKIPPING TO OPPOSITE SKIPPING')
+                //Caso in cui si è in fast-forward e si preme rewind o viceversa
                 clearControls();
-                setCurrentTime(seekToRef.current);
-                instanceOfPlayer.currentTime = seekToRef.current;
             }
-
+            //L'unico caso in cui non si vuole chiamare clearControls è il caso in cui si vada a ripremere lo stesso pulsante per far aumentare il seekRate
             controlRef.current = command;
             setControl(command);
 
+            //Gestione del seekRate
             switch (seekrateRef.current) {
                 default:
                     return;

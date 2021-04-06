@@ -129,6 +129,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         focusTo(parentFocusable);
         setReadyToPlay(false);
         setDisplayPlayer(false);
+
         if (altair.isHbbTV()) {
             if (window.navigator.userAgent.toUpperCase().indexOf("SAMSUNG") >= 0) {
                 if (
