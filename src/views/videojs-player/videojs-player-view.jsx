@@ -22,6 +22,11 @@ const VideojsPlayerView = ({ resumeSpatialNavigation }) => {
             player.ready(() => {
                 player.play();
             });
+
+            player.on('canplaythrough', () => {
+                console.log('Loader needs to unmount now');
+                setReadyToPlay(true);
+            })
         }
 
 

@@ -51,7 +51,7 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
         const dashjs = window.dashjs
         const initializedPlayer = dashjs.MediaPlayer().create();
-        if (url && readyToPlay) {
+        if (url) {
             initializedPlayer.initialize(playerRef.current, url, true);
             playerRef.current.addEventListener('abort', () => { onPlayerEvent('abort') });
             playerRef.current.addEventListener('canplay', () => { onPlayerEvent('canplay') });
@@ -81,7 +81,7 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 console.log('UNMOUNTING PLAYER EFFECTS');
                 playerRef.current.removeEventListener('abort', () => { onPlayerEvent('abort') });
                 playerRef.current.removeEventListener('canplay', () => { onPlayerEvent('canplay') });
-                playerRef.current.removeEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
+                playerRef.current.removeEventListener('canplaythrough', onCanPlayThrough);
                 playerRef.current.removeEventListener('durationchange', onDurationChange);
                 playerRef.current.removeEventListener('emptied', () => { onPlayerEvent('emptied') });
                 playerRef.current.removeEventListener('ended', onEnded);
@@ -112,6 +112,13 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const onPlayerEvent = (event) => {
         console.log(`Event from the player: ${event}`);
         playerStateRef.current = event;
+    }
+
+    const onCanPlayThrough = () => {
+        console.log('Event from the player: canplaythrough');
+        playerStateRef.current = 'canplaythrough';
+        setReadyToPlay(true);
+
     }
 
     const onDurationChange = () => {

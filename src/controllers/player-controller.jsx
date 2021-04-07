@@ -20,9 +20,8 @@ const PlayerController = () => {
 
     return (
         displayPlayer ? <div className='player-controller'>
-            {!readyToPlay ? <LoaderView /> :
-                neededPlayer === 'dashjs' ? <DashPlayerView /> :
-                    neededPlayer === 'videojs' ? <VideojsPlayerView /> : <span>Format not supported by the player</span>}
+            {readyToPlay ? null : <LoaderView />}
+            {neededPlayer === 'dashjs' ? <DashPlayerView /> : neededPlayer === 'videojs' ? <VideojsPlayerView /> : null}
         </div> : null
     )
 }

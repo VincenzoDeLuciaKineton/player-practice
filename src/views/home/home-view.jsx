@@ -23,7 +23,6 @@ const HomeView = ({ focusTo }) => {
             setShowErrorModal(true);
         } else {
             setParentFocusable('home');
-            setReadyToPlay(true);
             setDisplayPlayer(true);
         }
     }
