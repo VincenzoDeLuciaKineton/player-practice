@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
-import './mpd-player-view.css'
+import './dash-player-view.css'
 import { altair, navigationUtilities } from 'antares'
 import { ConfigContext } from '../../context/ConfigContext'
 import { PlayerContext } from '../../context/PlayerContext'
@@ -8,7 +8,7 @@ import LoaderView from '../loader/loader-view'
 import SpinnerView from '../spinner/spinner-view'
 import { ErrorContext } from '../../context/ErrorContext'
 
-const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
+const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
     const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext);
     const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext);
@@ -25,7 +25,7 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const bufferingRef = useRef(null);
 
     useEffect(() => {
-        console.log('Initializing player')
+        console.log('Initializing Dash Player');
 
         bufferingRef.current = setTimeout(() => {
             console.log('The player did not even start')
@@ -234,4 +234,4 @@ const MpdPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     )
 }
 
-export default navigationUtilities(MpdPlayerView);
+export default navigationUtilities(DashPlayerView);

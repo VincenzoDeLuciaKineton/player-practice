@@ -1,0 +1,8 @@
+.video-js {
+    height: 1080px !important;
+    width: 1920px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
