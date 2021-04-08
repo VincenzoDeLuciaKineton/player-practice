@@ -102,6 +102,7 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 videoElement.current.removeEventListener('timeupdate', () => { onPlayerEvent('timeupdate') });
                 videoElement.current.removeEventListener('volumechange', () => { onPlayerEvent('volumechange') });
                 videoElement.current.removeEventListener('waiting', () => { onPlayerEvent('waiting') });
+                console.log('UNMOUNTING EVENTS')
             }
             setReadyToPlay(false);
             videoElement.current = null;
@@ -170,6 +171,7 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 console.log('Starting the buffering countdown');
                 clearTimeout(bufferingRef.current);
                 bufferingRef.current = null;
+
                 bufferingRef.current = setTimeout(() => {
                     resumeSpatialNavigation();
                     console.log('The player started and then lost connection')

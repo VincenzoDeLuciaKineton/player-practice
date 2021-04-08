@@ -262,8 +262,8 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                         console.log('LEFT EDGE REACHED')
                         seekToRef.current = 0;
                         setSeekTo(0);
-                        focusTo('play-button');
                         playOrPause();
+                        focusTo('play-button');
                     }
                 }
             }, 1000)
