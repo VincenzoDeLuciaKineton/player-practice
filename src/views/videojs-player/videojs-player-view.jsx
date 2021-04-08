@@ -20,17 +20,25 @@ const VideojsPlayerView = ({ resumeSpatialNavigation }) => {
                 sources: [{ src: url, type: 'application/x-mpegURL' }]
             });
             player.ready(() => {
-                player.play();
+                videoElement.current.play();
             });
 
-            player.on('canplaythrough', () => {
-                console.log('Loader needs to unmount now');
-                setReadyToPlay(true);
-            })
+            if(videoElement.current){
+                videoElement.current.addEventListener('play', ()=>{onPlayerEvent('play')});
+                videoElement.current.addEventListener('playing', ()=>{onPlayerEvent('playing')});
+                videoElement.current.addEventListener('progress', ()=>{onPlayerEvent('progress')});
+            }
         }
 
 
     }, [])
+
+    const onPlayerEvent=(event)=>{
+        console.log('Event from the videojs player: ', event);
+        if (event==='playing'){
+            setReadyToPlay(true);
+        }
+    }
 
     return (
         <div className='video-and-controls'>

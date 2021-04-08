@@ -117,8 +117,6 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const onCanPlayThrough = () => {
         console.log('Event from the player: canplaythrough');
         playerStateRef.current = 'canplaythrough';
-        setReadyToPlay(true);
-
     }
 
     const onDurationChange = () => {
@@ -162,6 +160,7 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         console.log('Event from the player: loadeddata')
         playerStateRef.current = 'loadeddata';
         setShowLoader(false);
+        setReadyToPlay(true);
     }
 
     const onLoadStart = () => {
@@ -186,6 +185,9 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         bufferingRef.current = null;
         console.log('Resetting the buffering countdown')
         setBuffering(false);
+        if (!readyToPlay){
+            setReadyToPlay(true);
+        }
     }
 
     const onProgress = () => {
