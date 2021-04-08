@@ -154,6 +154,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
             setDisplayControls(true);
             resetControlsCountdown();
         } else {
+            console.log('PLAY OR PAUSE')
             if (controlRef.current === 'fast-forward' || controlRef.current === 'rewind') {
                 setCurrentTime(seekToRef.current);
                 instanceOfPlayer.currentTime = seekToRef.current;

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import './error-modal.css'
-import { AntaresHorizontalList, AntaresFocusable, navigationUtilities } from 'antares'
+import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent } from 'antares'
 import { ErrorContext } from '../../context/ErrorContext'
 import { PlayerContext } from '../../context/PlayerContext'
 import SpinnerView from '../spinner/spinner-view'
@@ -10,8 +10,9 @@ const ErrorModal = ({ focusTo }) => {
     const { setShowErrorModal, errorMessage, errorParentFocusable } = useContext(ErrorContext);
     const { displayPlayer, setDisplayPlayer } = useContext(PlayerContext);
 
+    let onKeyDown = undefined;
+
     const backToParentFocusable = () => {
-        console.log('ENTER DOWN ON ERROR BUTTON')
         if (displayPlayer) {
             setDisplayPlayer(false);
         }
@@ -20,6 +21,21 @@ const ErrorModal = ({ focusTo }) => {
             setShowErrorModal(false);
         }
     }
+
+    const onKeyDownHandler = (e) => {
+        if (e.keyCode === 8 || e.keyCode === 461) {
+            backToParentFocusable();
+        }
+    }
+
+    useEffect(() => {
+        if (!onKeyDown) {
+            onKeyDown = addKeydownEvent(onKeyDownHandler);
+        }
+        return () => {
+            removeKeydownEvent(onKeyDown);
+        };
+    }, [onKeyDownHandler]);
 
     return (
         <div className='error-modal-and-message'>

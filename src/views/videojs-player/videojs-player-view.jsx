@@ -15,11 +15,11 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const [showLoader, setShowLoader] = useState(true);
 
     const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext);
-    const {parentFocusable, setDisplayPlayer} = useContext(PlayerContext);
+    const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext);
     const { setShowErrorModal, setErrorMessage } = useContext(ErrorContext);
 
     const videoElement = useRef(null);
-    const bufferingRef=useRef(null);
+    const bufferingRef = useRef(null);
 
     useEffect(() => {
 
@@ -54,54 +54,54 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 videoElement.current.play();
             });
 
-            if(videoElement.current){
-                videoElement.current.addEventListener('abort', ()=>{onPlayerEvent('abort')});
-                videoElement.current.addEventListener('canplay', ()=>{onPlayerEvent('canplay')});
-                videoElement.current.addEventListener('canplaythrough', ()=>{onPlayerEvent('canplaythrough')});
-                videoElement.current.addEventListener('durationchange', ()=>{onPlayerEvent('durationchange')});
-                videoElement.current.addEventListener('emptied', ()=>{onPlayerEvent('emptied')});
-                videoElement.current.addEventListener('ended', ()=>{onPlayerEvent('ended')});
-                videoElement.current.addEventListener('error', ()=>{onPlayerEvent('error')});
-                videoElement.current.addEventListener('loadeddata', ()=>{onPlayerEvent('loadeddata')});
-                videoElement.current.addEventListener('loadstart', ()=>{onPlayerEvent('loadstart')});
-                videoElement.current.addEventListener('pause', ()=>{onPlayerEvent('pause')});
-                videoElement.current.addEventListener('play', ()=>{onPlayerEvent('play')});
-                videoElement.current.addEventListener('playing', ()=>{onPlayerEvent('playing')});
-                videoElement.current.addEventListener('progress', ()=>{onPlayerEvent('progress')});
-                videoElement.current.addEventListener('ratechange', ()=>{onPlayerEvent('ratechange')});
-                videoElement.current.addEventListener('seeked', ()=>{onPlayerEvent('seeked')});
-                videoElement.current.addEventListener('seeking', ()=>{onPlayerEvent('seeking')});
-                videoElement.current.addEventListener('stalled', ()=>{onPlayerEvent('stalled')});
-                videoElement.current.addEventListener('suspend', ()=>{onPlayerEvent('suspend')});
-                videoElement.current.addEventListener('timeupdate', ()=>{onPlayerEvent('timeupdate')});
-                videoElement.current.addEventListener('volumechange', ()=>{onPlayerEvent('volumechange')});
-                videoElement.current.addEventListener('waiting', ()=>{onPlayerEvent('waiting')});
+            if (videoElement.current) {
+                videoElement.current.addEventListener('abort', () => { onPlayerEvent('abort') });
+                videoElement.current.addEventListener('canplay', () => { onPlayerEvent('canplay') });
+                videoElement.current.addEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
+                videoElement.current.addEventListener('durationchange', () => { onPlayerEvent('durationchange') });
+                videoElement.current.addEventListener('emptied', () => { onPlayerEvent('emptied') });
+                videoElement.current.addEventListener('ended', () => { onPlayerEvent('ended') });
+                videoElement.current.addEventListener('error', () => { onPlayerEvent('error') });
+                videoElement.current.addEventListener('loadeddata', () => { onPlayerEvent('loadeddata') });
+                videoElement.current.addEventListener('loadstart', () => { onPlayerEvent('loadstart') });
+                videoElement.current.addEventListener('pause', () => { onPlayerEvent('pause') });
+                videoElement.current.addEventListener('play', () => { onPlayerEvent('play') });
+                videoElement.current.addEventListener('playing', () => { onPlayerEvent('playing') });
+                videoElement.current.addEventListener('progress', () => { onPlayerEvent('progress') });
+                videoElement.current.addEventListener('ratechange', () => { onPlayerEvent('ratechange') });
+                videoElement.current.addEventListener('seeked', () => { onPlayerEvent('seeked') });
+                videoElement.current.addEventListener('seeking', () => { onPlayerEvent('seeking') });
+                videoElement.current.addEventListener('stalled', () => { onPlayerEvent('stalled') });
+                videoElement.current.addEventListener('suspend', () => { onPlayerEvent('suspend') });
+                videoElement.current.addEventListener('timeupdate', () => { onPlayerEvent('timeupdate') });
+                videoElement.current.addEventListener('volumechange', () => { onPlayerEvent('volumechange') });
+                videoElement.current.addEventListener('waiting', () => { onPlayerEvent('waiting') });
             }
         }
 
-        return ()=>{
-            if(videoElement.current){
-                videoElement.current.removeEventListener('abort', ()=>{onPlayerEvent('abort')});
-                videoElement.current.removeEventListener('canplay', ()=>{onPlayerEvent('canplay')});
-                videoElement.current.removeEventListener('canplaythrough', ()=>{onPlayerEvent('canplaythrough')});
-                videoElement.current.removeEventListener('durationchange', ()=>{onPlayerEvent('durationchange')});
-                videoElement.current.removeEventListener('emptied', ()=>{onPlayerEvent('emptied')});
-                videoElement.current.removeEventListener('ended', ()=>{onPlayerEvent('ended')});
-                videoElement.current.removeEventListener('error', ()=>{onPlayerEvent('error')});
-                videoElement.current.removeEventListener('loadeddata', ()=>{onPlayerEvent('loadeddata')});
-                videoElement.current.removeEventListener('loadstart', ()=>{onPlayerEvent('loadstart')});
-                videoElement.current.removeEventListener('pause', ()=>{onPlayerEvent('pause')});
-                videoElement.current.removeEventListener('play', ()=>{onPlayerEvent('play')});
-                videoElement.current.removeEventListener('playing', ()=>{onPlayerEvent('playing')});
-                videoElement.current.removeEventListener('progress', ()=>{onPlayerEvent('progress')});
-                videoElement.current.removeEventListener('ratechange', ()=>{onPlayerEvent('ratechange')});
-                videoElement.current.removeEventListener('seeked', ()=>{onPlayerEvent('seeked')});
-                videoElement.current.removeEventListener('seeking', ()=>{onPlayerEvent('seeking')});
-                videoElement.current.removeEventListener('stalled', ()=>{onPlayerEvent('stalled')});
-                videoElement.current.removeEventListener('suspend', ()=>{onPlayerEvent('suspend')});
-                videoElement.current.removeEventListener('timeupdate', ()=>{onPlayerEvent('timeupdate')});
-                videoElement.current.removeEventListener('volumechange', ()=>{onPlayerEvent('volumechange')});
-                videoElement.current.removeEventListener('waiting', ()=>{onPlayerEvent('waiting')});
+        return () => {
+            if (videoElement.current) {
+                videoElement.current.removeEventListener('abort', () => { onPlayerEvent('abort') });
+                videoElement.current.removeEventListener('canplay', () => { onPlayerEvent('canplay') });
+                videoElement.current.removeEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
+                videoElement.current.removeEventListener('durationchange', () => { onPlayerEvent('durationchange') });
+                videoElement.current.removeEventListener('emptied', () => { onPlayerEvent('emptied') });
+                videoElement.current.removeEventListener('ended', () => { onPlayerEvent('ended') });
+                videoElement.current.removeEventListener('error', () => { onPlayerEvent('error') });
+                videoElement.current.removeEventListener('loadeddata', () => { onPlayerEvent('loadeddata') });
+                videoElement.current.removeEventListener('loadstart', () => { onPlayerEvent('loadstart') });
+                videoElement.current.removeEventListener('pause', () => { onPlayerEvent('pause') });
+                videoElement.current.removeEventListener('play', () => { onPlayerEvent('play') });
+                videoElement.current.removeEventListener('playing', () => { onPlayerEvent('playing') });
+                videoElement.current.removeEventListener('progress', () => { onPlayerEvent('progress') });
+                videoElement.current.removeEventListener('ratechange', () => { onPlayerEvent('ratechange') });
+                videoElement.current.removeEventListener('seeked', () => { onPlayerEvent('seeked') });
+                videoElement.current.removeEventListener('seeking', () => { onPlayerEvent('seeking') });
+                videoElement.current.removeEventListener('stalled', () => { onPlayerEvent('stalled') });
+                videoElement.current.removeEventListener('suspend', () => { onPlayerEvent('suspend') });
+                videoElement.current.removeEventListener('timeupdate', () => { onPlayerEvent('timeupdate') });
+                videoElement.current.removeEventListener('volumechange', () => { onPlayerEvent('volumechange') });
+                videoElement.current.removeEventListener('waiting', () => { onPlayerEvent('waiting') });
             }
             setReadyToPlay(false);
             videoElement.current = null;
@@ -109,15 +109,15 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         }
     }, [])
 
-    const onPlayerEvent=(event)=>{
-        if(event!=='timeupdate'){
+    const onPlayerEvent = (event) => {
+        if (event !== 'timeupdate') {
             console.log('Event from the videojs player: ', event);
         }
 
-        switch(event){
+        switch (event) {
 
             case 'durationchange':
-                if(videoElement.current.duration>0){
+                if (videoElement.current.duration > 0) {
                     setDuration(videoElement.current.duration);
                 }
                 break;
@@ -143,8 +143,8 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                     }
                 }
                 break;
-            
-            case 'loadeddata': 
+
+            case 'loadeddata':
                 setShowLoader(false);
                 setReadyToPlay(true);
                 break;
@@ -154,7 +154,7 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 bufferingRef.current = null;
                 console.log('Resetting the buffering countdown')
                 setBuffering(false);
-                if (!readyToPlay){
+                if (!readyToPlay) {
                     setReadyToPlay(true);
                 }
                 break;
@@ -194,10 +194,10 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 (buffering ?
                     <SpinnerView /> :
                     <Controls
-                        instanceOfPlayer={videoElement.current} 
-                        currentTime={currentTime} 
-                        setCurrentTime={setCurrentTime} 
-                        duration={duration}/>) :
+                        instanceOfPlayer={videoElement.current}
+                        currentTime={currentTime}
+                        setCurrentTime={setCurrentTime}
+                        duration={duration} />) :
                 null}
         </div>
     )
