@@ -59,14 +59,14 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
             playerRef.current.addEventListener('durationchange', onDurationChange);
             playerRef.current.addEventListener('emptied', () => { onPlayerEvent('emptied') });
             playerRef.current.addEventListener('ended', onEnded);
-            playerRef.current.addEventListener('error', onError)
+            playerRef.current.addEventListener('error', () => { onPlayerEvent('error') })
             playerRef.current.addEventListener('loadeddata', onLoadedData);
-            playerRef.current.addEventListener('loadstart', onLoadStart);
-            playerRef.current.addEventListener('pause', onPause);
-            playerRef.current.addEventListener('play', onPlay);
+            playerRef.current.addEventListener('loadstart', ()=>{onPlayerEvent('loadstart')});
+            playerRef.current.addEventListener('pause', ()=>{onPlayerEvent('pause')});
+            playerRef.current.addEventListener('play', ()=>{onPlayerEvent('play')});
             playerRef.current.addEventListener('playing', onPlaying);
             playerRef.current.addEventListener('progress', onProgress);
-            playerRef.current.addEventListener('ratechange', onRateChange);
+            playerRef.current.addEventListener('ratechange', () => { onPlayerEvent('ratechange') });
             playerRef.current.addEventListener('seeked', () => { onPlayerEvent('seeked') });
             playerRef.current.addEventListener('seeking', () => { onPlayerEvent('seeking') });
             playerRef.current.addEventListener('stalled', () => { onPlayerEvent('stalled') });
@@ -81,15 +81,15 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 console.log('UNMOUNTING PLAYER EFFECTS');
                 playerRef.current.removeEventListener('abort', () => { onPlayerEvent('abort') });
                 playerRef.current.removeEventListener('canplay', () => { onPlayerEvent('canplay') });
-                playerRef.current.removeEventListener('canplaythrough', onCanPlayThrough);
+                playerRef.current.removeEventListener('canplaythrough', ()=>{onPlayerEvent('canplaythrough')});
                 playerRef.current.removeEventListener('durationchange', onDurationChange);
                 playerRef.current.removeEventListener('emptied', () => { onPlayerEvent('emptied') });
                 playerRef.current.removeEventListener('ended', onEnded);
-                playerRef.current.removeEventListener('error', onError)
+                playerRef.current.removeEventListener('error', () => { onPlayerEvent('error') })
                 playerRef.current.removeEventListener('loadeddata', onLoadedData);
-                playerRef.current.removeEventListener('loadstart', onLoadStart);
-                playerRef.current.removeEventListener('pause', onPause);
-                playerRef.current.removeEventListener('play', onPlay);
+                playerRef.current.removeEventListener('loadstart', ()=>{onPlayerEvent('loadstart')});
+                playerRef.current.removeEventListener('pause', ()=>{onPlayerEvent('pause')});
+                playerRef.current.removeEventListener('play', ()=>{onPlayerEvent('play')});
                 playerRef.current.removeEventListener('playing', onPlaying);
                 playerRef.current.removeEventListener('progress', onProgress);
                 playerRef.current.removeEventListener('ratechange', () => { onPlayerEvent('ratechange') });
@@ -112,11 +112,6 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const onPlayerEvent = (event) => {
         console.log(`Event from the player: ${event}`);
         playerStateRef.current = event;
-    }
-
-    const onCanPlayThrough = () => {
-        console.log('Event from the player: canplaythrough');
-        playerStateRef.current = 'canplaythrough';
     }
 
     const onDurationChange = () => {
@@ -151,31 +146,11 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         }
     }
 
-    const onError = () => {
-        console.log('Event from the player: ended');
-        playerStateRef.current = 'error';
-    }
-
     const onLoadedData = () => {
         console.log('Event from the player: loadeddata')
         playerStateRef.current = 'loadeddata';
         setShowLoader(false);
         setReadyToPlay(true);
-    }
-
-    const onLoadStart = () => {
-        console.log('Event from the player: loadstart');
-        playerStateRef.current = 'loadstart';
-    }
-
-    const onPause = () => {
-        console.log('Event from the player: pause at', playerRef.current.currentTime)
-        playerStateRef.current = 'pause';
-    }
-
-    const onPlay = () => {
-        console.log('Event from the player: play');
-        playerStateRef.current = 'play';
     }
 
     const onPlaying = () => {
@@ -197,11 +172,6 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         bufferingRef.current = null;
         console.log('Resetting the buffering countdown');
 
-    }
-
-    const onRateChange = () => {
-        console.log('Event from the player: ratechange');
-        playerStateRef.current = 'ratechange';
     }
 
     const onTimeUpdate = () => {
@@ -228,7 +198,6 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
     return (
         <div className='video-and-controls'>
-            {showLoader ? <LoaderView /> : null}
             <video id="videoPlayer" ref={playerRef}></video>
             {duration > 0 && !showLoader ?
                 (buffering ?

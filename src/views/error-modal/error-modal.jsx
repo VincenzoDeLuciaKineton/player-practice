@@ -2,17 +2,13 @@ import React, { useContext } from 'react'
 import './error-modal.css'
 import { AntaresHorizontalList, AntaresFocusable, navigationUtilities } from 'antares'
 import { ErrorContext } from '../../context/ErrorContext'
-import SpinnerView from '../spinner/spinner-view'
 import { PlayerContext } from '../../context/PlayerContext'
+import SpinnerView from '../spinner/spinner-view'
 
 const ErrorModal = ({ focusTo }) => {
 
     const { setShowErrorModal, errorMessage, errorParentFocusable } = useContext(ErrorContext);
     const { displayPlayer, setDisplayPlayer } = useContext(PlayerContext);
-
-    /* useEffect(() => {
-        focusTo('error-button-id')
-    }, []) */
 
     const backToParentFocusable = () => {
         console.log('ENTER DOWN ON ERROR BUTTON')
