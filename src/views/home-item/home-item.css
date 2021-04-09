@@ -1,17 +1,23 @@
-.home-outer {
-    width: 800px !important;
-    height: 165px !important;
+.home-button {
+    font-size: 40px ;
+    width: 300px !important;
+    height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center!important;
+    padding: 20px;
+    color: white;
 }
 
-.home-inner {
-    width: 800px !important;
-    height: 165px !important;
+.home-button-focused {
+    font-size: 40px;
+    width: 300px !important;
+    height: 125px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center!important;
+    background-color: #3184c3;
+    color: white;
 }

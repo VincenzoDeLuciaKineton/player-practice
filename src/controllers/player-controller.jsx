@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { ConfigContext } from '../context/ConfigContext'
 import { PlayerContext } from '../context/PlayerContext'
 import DashPlayerView from '../views/dash-player/dash-player-view'
@@ -7,16 +7,8 @@ import LoaderView from '../views/loader/loader-view'
 
 const PlayerController = () => {
 
-    const { url, readyToPlay } = useContext(ConfigContext);
-    const { neededPlayer, setNeededPlayer, displayPlayer } = useContext(PlayerContext)
-
-    useEffect(() => {
-        if (url && url.endsWith('.mpd')) {
-            setNeededPlayer('dashjs')
-        } else if (url && url.endsWith('.m3u8')) {
-            setNeededPlayer('videojs')
-        }
-    })
+    const { readyToPlay } = useContext(ConfigContext);
+    const { neededPlayer, displayPlayer } = useContext(PlayerContext)
 
     return (
         displayPlayer ? <div className='player-controller'>

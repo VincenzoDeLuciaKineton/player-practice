@@ -7,15 +7,16 @@ export const ConfigProvider = ({ children }) => {
 
     const { setShowErrorModal, setErrorMessage, setErrorParentFocusable } = useContext(ErrorContext)
 
-    const [url, setUrl] = useState(null);
+    // const [url, setUrl] = useState(null);
+    const [urlsFromConfig, setUrlsFromConfig] = useState([]);
     const [controlsCountdownFromConfig, setControlsCountdownFromConfig] = useState(5000);
     const [readyToPlay, setReadyToPlay] = useState(false);
 
     useEffect(() => {
         fetch(`${process.env.PUBLIC_URL}/config.json`).then(res => res.json()
         ).then(res => {
-            if (res.url) {
-                setUrl(res.url);
+            if (res.urls) {
+                setUrlsFromConfig(res.urls);
             } else {
                 setErrorParentFocusable('home-button-id')
                 setErrorMessage('Failed to retrieve the requested data')
@@ -32,7 +33,7 @@ export const ConfigProvider = ({ children }) => {
     }, [])
 
     return (
-        <ConfigContext.Provider value={{ url, setUrl, readyToPlay, setReadyToPlay, controlsCountdownFromConfig }}>
+        <ConfigContext.Provider value={{ urlsFromConfig, setUrlsFromConfig, readyToPlay, setReadyToPlay, controlsCountdownFromConfig }}>
             {children}
         </ConfigContext.Provider>
     )

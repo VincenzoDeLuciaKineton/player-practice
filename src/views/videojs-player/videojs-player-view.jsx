@@ -14,8 +14,8 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
     const [buffering, setBuffering] = useState(false);
     const [showLoader, setShowLoader] = useState(true);
 
-    const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext);
-    const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext);
+    const { readyToPlay, setReadyToPlay } = useContext(ConfigContext);
+    const { setDisplayPlayer, videoToPlay, parentFocusable } = useContext(PlayerContext);
     const { setShowErrorModal, setErrorMessage } = useContext(ErrorContext);
 
     const videoElement = useRef(null);
@@ -45,10 +45,10 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
             }
         }
 
-        if (url) {
+        if (videoToPlay) {
             let player = window.videojs(videoElement.current, {
                 controls: false,
-                sources: [{ src: url, type: 'application/x-mpegURL' }]
+                sources: [{ src: videoToPlay, type: 'application/x-mpegURL' }]
             });
             player.ready(() => {
                 videoElement.current.play();
@@ -192,7 +192,7 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 className="video-js"
                 ref={videoElement}
             >
-                <source src={url} type='application/x-mpegURL' />
+                <source src={videoToPlay} type='application/x-mpegURL' />
             </video>
             {duration > 0 && !showLoader ?
                 (buffering ?

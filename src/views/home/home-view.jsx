@@ -1,32 +1,31 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import './home-view.css'
-import { AntaresHorizontalList, AntaresFocusable, navigationUtilities } from 'antares'
-import { PlayerContext } from '../../context/PlayerContext'
+import { AntaresHorizontalList, navigationUtilities } from 'antares'
 import { ConfigContext } from '../../context/ConfigContext'
-import { ErrorContext } from '../../context/ErrorContext'
+import HomeItem from '../home-item/home-item'
+
 const HomeView = ({ focusTo }) => {
 
-    const { setDisplayPlayer, setParentFocusable } = useContext(PlayerContext);
-    const { url } = useContext(ConfigContext);
-    const { setShowErrorModal, setErrorParentFocusable, setErrorMessage } = useContext(ErrorContext);
+    const [videos, setVideos] = useState(null);
+
+    const { urlsFromConfig } = useContext(ConfigContext);
 
     useEffect(() => {
-        focusTo('home-button-id');
+        let videoList = urlsFromConfig.map((video, index) => {
+            return <HomeItem
+                className='home-item'
+                key={index}
+                index={index}
+                url={video.url}>
+                <span>Video {index + 1}</span>
+            </HomeItem>
+        });
+        setVideos(videoList)
+    }, [urlsFromConfig])
+
+    useEffect(() => {
+        focusTo('home-button-id-0')
     }, [])
-
-    const onEnterDown = () => {
-        setErrorParentFocusable('home-button-id');
-        if (!url || url === '') {
-            console.log('NO URL FOUND')
-            focusTo('error-button-id');
-            setErrorMessage('Unable to retrieve selected content')
-            setShowErrorModal(true);
-        } else {
-            setParentFocusable('home');
-            setDisplayPlayer(true);
-        }
-    }
-
 
     return (
         <AntaresHorizontalList containerClassname='home-outer'
@@ -34,13 +33,7 @@ const HomeView = ({ focusTo }) => {
             focusableId='home'
             retainLastFocus={true}
             innerWidth={500}>
-            <AntaresFocusable classname='home-button'
-                focusedClassname='home-button-focused'
-                focusableId='home-button-id'
-                onEnterDown={onEnterDown}
-                index={0}>
-                <span>Go to the player</span>
-            </AntaresFocusable>
+            {videos}
         </AntaresHorizontalList>
     )
 }

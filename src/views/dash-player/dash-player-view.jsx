@@ -9,8 +9,8 @@ import { ErrorContext } from '../../context/ErrorContext'
 
 const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
-    const { url, readyToPlay, setReadyToPlay } = useContext(ConfigContext);
-    const { parentFocusable, setDisplayPlayer } = useContext(PlayerContext);
+    const { readyToPlay, setReadyToPlay } = useContext(ConfigContext);
+    const { setDisplayPlayer, videoToPlay, parentFocusable } = useContext(PlayerContext);
     const { setShowErrorModal, setErrorMessage } = useContext(ErrorContext);
 
     const [currentTime, setCurrentTime] = useState(0);
@@ -50,8 +50,8 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
 
         const dashjs = window.dashjs
         const initializedPlayer = dashjs.MediaPlayer().create();
-        if (url) {
-            initializedPlayer.initialize(playerRef.current, url, true);
+        if (videoToPlay) {
+            initializedPlayer.initialize(playerRef.current, videoToPlay, true);
             playerRef.current.addEventListener('abort', () => { onPlayerEvent('abort') });
             playerRef.current.addEventListener('canplay', () => { onPlayerEvent('canplay') });
             playerRef.current.addEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
