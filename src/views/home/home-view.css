@@ -1,6 +1,6 @@
 .home-outer {
     width: 1920px !important;
-    height: 165px !important;
+    height: 200px !important;
     display: flex !important;
     flex-direction: row !important;
     justify-content: center !important;
@@ -9,9 +9,9 @@
 
 .home-inner {
     width: 800px !important;
-    height: 165px !important;
+    height: 200px !important;
     display: flex !important;
     flex-direction: row !important;
-    justify-content: space-evenly !important;
+    justify-content: center!important;
     align-items: center!important;
 }

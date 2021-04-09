@@ -8,6 +8,8 @@
     align-items: center!important;
     padding: 20px;
     color: white;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .home-button-focused {
@@ -21,4 +23,6 @@
     background-color: #3184c3;
     padding: 20px;
     color: white;
+    margin-left: 10px;
+    margin-right: 10px;
 }
