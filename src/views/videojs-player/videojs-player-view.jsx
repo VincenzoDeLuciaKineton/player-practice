@@ -46,6 +46,31 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         }
 
         if (videoToPlay) {
+            let overrideNative = false;
+            if (window.navigator.userAgent.toUpperCase().indexOf('SAMSUNG') >= 0) {
+                if ((window.navigator.userAgent.toUpperCase().indexOf('2020') >= 0 || window.navigator.userAgent.toUpperCase().indexOf('2021') >= 0)) {
+                    overrideNative = false;
+                }
+                else {
+                    overrideNative = true;
+                }
+            } else {
+                if (window.navigator.userAgent.toUpperCase().indexOf('LG') < 0)
+                    overrideNative = true;
+            }
+
+            if (overrideNative) {
+                window.videojs.options.hls.overrideNative = true;
+                window.videojs.options.html5.nativeAudioTracks = false;
+            }
+            else {
+                window.videojs.options.html5.nativeAudioTracks = true;
+            }
+            window.videojs.Hls.MAX_GOAL_BUFFER_LENGTH = 7;
+            window.videojs.options.html5.nativeVideoTracks = false;
+            window.videojs.options.enableLowInitialPlaylist = true;
+            window.videojs.options.hls.handleManifestRedirects = true;
+
             let player = window.videojs(videoElement.current, {
                 controls: false,
                 sources: [{ src: videoToPlay, type: 'application/x-mpegURL' }]

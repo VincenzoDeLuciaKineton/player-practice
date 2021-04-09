@@ -1,5 +1,5 @@
 .home-outer {
-    width: 800px !important;
+    width: 1920px !important;
     height: 165px !important;
     display: flex !important;
     flex-direction: row !important;
@@ -12,6 +12,6 @@
     height: 165px !important;
     display: flex !important;
     flex-direction: row !important;
-    justify-content: center !important;
+    justify-content: space-evenly !important;
     align-items: center!important;
 }

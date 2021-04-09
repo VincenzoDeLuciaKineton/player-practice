@@ -225,6 +225,7 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                     if (seekToRef.current < duration - (5 * seekrateRef.current)) {
                         if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
                             seekToRef.current += 5 * seekrateRef.current;
+                            instanceOfPlayer.currentTime = seekToRef.current;
                             setSeekTo(seekToRef.current);
                             console.log('Forwarding seekTo to: ', seekToRef.current);
                         } else {
@@ -256,8 +257,8 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 } else if (controlRef.current === 'rewind') {
                     if (seekToRef.current > 5 * seekrateRef.current) {
                         seekToRef.current -= 5 * seekrateRef.current;
+                        instanceOfPlayer.currentTime = seekToRef.current;
                         setSeekTo(seekToRef.current);
-                        console.log('Rewinding seekTo to: ', seekToRef.current);
                     } else if (seekToRef.current <= 5 * seekrateRef.current) {
                         console.log('LEFT EDGE REACHED')
                         seekToRef.current = 0;

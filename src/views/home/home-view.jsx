@@ -32,7 +32,7 @@ const HomeView = ({ focusTo }) => {
             innerClassname='home-inner'
             focusableId='home'
             retainLastFocus={true}
-            innerWidth={500}>
+            innerWidth={1920}>
             {videos}
         </AntaresHorizontalList>
     )

@@ -15,8 +15,10 @@ const HomeItem = ({ index, url, focusTo }) => {
         } else if (url && url.endsWith('.m3u8')) {
             setNeededPlayer('videojs')
         }
+
         setVideoToPlay(url);
         setErrorParentFocusable(`home-button-id-${index}`);
+
         if (!url || url === '') {
             console.log('NO URLS FOUND')
             focusTo('error-button-id');
