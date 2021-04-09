@@ -223,17 +223,14 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 //Fast forward
                 if (controlRef.current === 'fast-forward') {
                     if (seekToRef.current < duration - (5 * seekrateRef.current)) {
-                        if (duration - (5 * seekrateRef.current) < seekToRef.current < duration) {
-                            seekToRef.current += 5 * seekrateRef.current;
-                            instanceOfPlayer.currentTime = seekToRef.current;
-                            setSeekTo(seekToRef.current);
-                            console.log('Forwarding seekTo to: ', seekToRef.current);
-                        } else {
-                            console.log('LAST FORWARD, ', seekToRef.current, duration);
-                            seekToRef.current = duration;
-                            setSeekTo(seekToRef.current);
-                        }
-                    } else {
+                        seekToRef.current += 5 * seekrateRef.current;
+                        setSeekTo(seekToRef.current);
+                        console.log('Forwarding seekTo to: ', seekToRef.current);
+                    } else if ((duration - (5 * seekrateRef.current)) < seekToRef.current && seekToRef.current < duration) {
+                        console.log('LAST FORWARD ', seekToRef.current, duration);
+                        seekToRef.current = duration;
+                        setSeekTo(seekToRef.current);
+                    } else if (seekToRef.current === duration) {
                         resumeSpatialNavigation();
                         focusTo(parentFocusable);
                         setReadyToPlay(false);
@@ -257,7 +254,6 @@ const Controls = ({ instanceOfPlayer, duration, currentTime, setCurrentTime, foc
                 } else if (controlRef.current === 'rewind') {
                     if (seekToRef.current > 5 * seekrateRef.current) {
                         seekToRef.current -= 5 * seekrateRef.current;
-                        instanceOfPlayer.currentTime = seekToRef.current;
                         setSeekTo(seekToRef.current);
                     } else if (seekToRef.current <= 5 * seekrateRef.current) {
                         console.log('LEFT EDGE REACHED')
