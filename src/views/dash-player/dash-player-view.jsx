@@ -4,7 +4,6 @@ import { altair, navigationUtilities } from 'antares'
 import { ConfigContext } from '../../context/ConfigContext'
 import { PlayerContext } from '../../context/PlayerContext'
 import Controls from '../controls/controls'
-import LoaderView from '../loader/loader-view'
 import SpinnerView from '../spinner/spinner-view'
 import { ErrorContext } from '../../context/ErrorContext'
 
@@ -61,9 +60,9 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
             playerRef.current.addEventListener('ended', onEnded);
             playerRef.current.addEventListener('error', () => { onPlayerEvent('error') })
             playerRef.current.addEventListener('loadeddata', onLoadedData);
-            playerRef.current.addEventListener('loadstart', ()=>{onPlayerEvent('loadstart')});
-            playerRef.current.addEventListener('pause', ()=>{onPlayerEvent('pause')});
-            playerRef.current.addEventListener('play', ()=>{onPlayerEvent('play')});
+            playerRef.current.addEventListener('loadstart', () => { onPlayerEvent('loadstart') });
+            playerRef.current.addEventListener('pause', () => { onPlayerEvent('pause') });
+            playerRef.current.addEventListener('play', () => { onPlayerEvent('play') });
             playerRef.current.addEventListener('playing', onPlaying);
             playerRef.current.addEventListener('progress', onProgress);
             playerRef.current.addEventListener('ratechange', () => { onPlayerEvent('ratechange') });
@@ -81,15 +80,15 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 console.log('UNMOUNTING PLAYER EFFECTS');
                 playerRef.current.removeEventListener('abort', () => { onPlayerEvent('abort') });
                 playerRef.current.removeEventListener('canplay', () => { onPlayerEvent('canplay') });
-                playerRef.current.removeEventListener('canplaythrough', ()=>{onPlayerEvent('canplaythrough')});
+                playerRef.current.removeEventListener('canplaythrough', () => { onPlayerEvent('canplaythrough') });
                 playerRef.current.removeEventListener('durationchange', onDurationChange);
                 playerRef.current.removeEventListener('emptied', () => { onPlayerEvent('emptied') });
                 playerRef.current.removeEventListener('ended', onEnded);
                 playerRef.current.removeEventListener('error', () => { onPlayerEvent('error') })
                 playerRef.current.removeEventListener('loadeddata', onLoadedData);
-                playerRef.current.removeEventListener('loadstart', ()=>{onPlayerEvent('loadstart')});
-                playerRef.current.removeEventListener('pause', ()=>{onPlayerEvent('pause')});
-                playerRef.current.removeEventListener('play', ()=>{onPlayerEvent('play')});
+                playerRef.current.removeEventListener('loadstart', () => { onPlayerEvent('loadstart') });
+                playerRef.current.removeEventListener('pause', () => { onPlayerEvent('pause') });
+                playerRef.current.removeEventListener('play', () => { onPlayerEvent('play') });
                 playerRef.current.removeEventListener('playing', onPlaying);
                 playerRef.current.removeEventListener('progress', onProgress);
                 playerRef.current.removeEventListener('ratechange', () => { onPlayerEvent('ratechange') });
@@ -160,7 +159,7 @@ const DashPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
         bufferingRef.current = null;
         console.log('Resetting the buffering countdown')
         setBuffering(false);
-        if (!readyToPlay){
+        if (!readyToPlay) {
             setReadyToPlay(true);
         }
     }

@@ -63,6 +63,7 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 videoElement.current.addEventListener('ended', () => { onPlayerEvent('ended') });
                 videoElement.current.addEventListener('error', () => { onPlayerEvent('error') });
                 videoElement.current.addEventListener('loadeddata', () => { onPlayerEvent('loadeddata') });
+                videoElement.current.addEventListener('loadedmetadata', () => { onPlayerEvent('loadedmetadata') });
                 videoElement.current.addEventListener('loadstart', () => { onPlayerEvent('loadstart') });
                 videoElement.current.addEventListener('pause', () => { onPlayerEvent('pause') });
                 videoElement.current.addEventListener('play', () => { onPlayerEvent('play') });
@@ -89,6 +90,7 @@ const VideojsPlayerView = ({ focusTo, resumeSpatialNavigation }) => {
                 videoElement.current.removeEventListener('ended', () => { onPlayerEvent('ended') });
                 videoElement.current.removeEventListener('error', () => { onPlayerEvent('error') });
                 videoElement.current.removeEventListener('loadeddata', () => { onPlayerEvent('loadeddata') });
+                videoElement.current.removeEventListener('loadedmetadata', () => { onPlayerEvent('loadedmetadata') });
                 videoElement.current.removeEventListener('loadstart', () => { onPlayerEvent('loadstart') });
                 videoElement.current.removeEventListener('pause', () => { onPlayerEvent('pause') });
                 videoElement.current.removeEventListener('play', () => { onPlayerEvent('play') });

@@ -7,7 +7,7 @@ import { ErrorContext } from '../../context/ErrorContext'
 const HomeView = ({ focusTo }) => {
 
     const { setDisplayPlayer, setParentFocusable } = useContext(PlayerContext);
-    const { url, setReadyToPlay } = useContext(ConfigContext);
+    const { url } = useContext(ConfigContext);
     const { setShowErrorModal, setErrorParentFocusable, setErrorMessage } = useContext(ErrorContext);
 
     useEffect(() => {

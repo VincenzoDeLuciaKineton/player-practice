@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import './error-modal.css'
 import { AntaresHorizontalList, AntaresFocusable, navigationUtilities, addKeydownEvent, removeKeydownEvent } from 'antares'
 import { ErrorContext } from '../../context/ErrorContext'
@@ -10,7 +10,7 @@ const ErrorModal = ({ focusTo }) => {
     const { setShowErrorModal, errorMessage, errorParentFocusable } = useContext(ErrorContext);
     const { displayPlayer, setDisplayPlayer } = useContext(PlayerContext);
 
-    let onKeyDown = undefined;
+    const onKeyDown = useRef(null);
 
     const backToParentFocusable = () => {
         if (displayPlayer) {
@@ -29,11 +29,12 @@ const ErrorModal = ({ focusTo }) => {
     }
 
     useEffect(() => {
-        if (!onKeyDown) {
-            onKeyDown = addKeydownEvent(onKeyDownHandler);
+        if (!onKeyDown.current) {
+            onKeyDown.current = addKeydownEvent(onKeyDownHandler);
         }
         return () => {
-            removeKeydownEvent(onKeyDown);
+            removeKeydownEvent(onKeyDown.current);
+            onKeyDown.current = null;
         };
     }, [onKeyDownHandler]);
 
